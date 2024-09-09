@@ -239,13 +239,13 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
 
   override protected val fieldsCannotBeUpdated: Seq[String] = Seq(
     "id",
-    "last_modified_date",
     "billing_address",
-    "created_by_id",
-    "is_deleted",
     "shipping_address",
+    "is_deleted",
+    "created_by_id",
     "created_date",
-    "last_modified_by_id"
+    "last_modified_by_id",
+    "last_modified_date"
   )
 
 }

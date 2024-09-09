@@ -22,11 +22,40 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
 
   private val connector = new DASSalesforceConnector(options)
 
+  private val accountContactRoleTable = new DASSalesforceAccountContactRoleTable(connector)
   private val accountTable = new DASSalesforceAccountTable(connector)
-  private val staticTables = Seq(accountTable)
+  private val assetTable = new DASSalesforceAsset(connector)
+  private val contactTable = new DASSalesforceContactTable(connector)
+  private val contractTable = new DASSalesforceContractTable(connector)
+  private val leadTable = new DASSalesforceLeadTable(connector)
+  private val objectPermissionTable = new DASSalesforceObjectPermissionTable(connector)
+  private val opportunityContactRoleTable = new DASSalesforceOpportunityContactRoleTable(connector)
+  private val opportunityTable = new DASSalesforceOpportunityTable(connector)
+  private val orderTable = new DASSalesforceOrderTable(connector)
+  private val permissionSetAssignmentTable = new DASSalesforcePermissionSetAssignmentTable(connector)
+  private val permissionSetTable = new DASSalesforcePermissionSetTable(connector)
+  private val pricebookTable = new DASSalesforcePricebookTable(connector)
+  private val productTable = new DASSalesforceProductTable(connector)
+  private val userTable = new DASSalesforceUserTable(connector)
+  private val staticTables = Seq(
+    accountContactRoleTable,
+    accountTable,
+    assetTable,
+    contactTable,
+    contractTable,
+    leadTable,
+    objectPermissionTable,
+    opportunityContactRoleTable,
+    opportunityTable,
+    orderTable,
+    permissionSetAssignmentTable,
+    permissionSetTable,
+    pricebookTable,
+    productTable,
+    userTable
+  )
 
-  private val dynamicTableNames =
-    options.get("dynamic_objects").map(_.split(",").toSeq).getOrElse(Seq.empty) ++ Seq("Opportunity")
+  private val dynamicTableNames = options.get("dynamic_objects").map(_.split(",").toSeq).getOrElse(Seq.empty)
 
   logger.debug(s"Dynamic tables: $dynamicTableNames")
   connector.forceApi.describeGlobal().getSObjects.asScala.foreach(sObject => logger.debug(sObject.getName))
