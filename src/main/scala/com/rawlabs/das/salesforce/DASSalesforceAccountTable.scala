@@ -1,13 +1,13 @@
-/**
+/*
  * Copyright 2024 RAW Labs S.A.
- * All rights reserved.
  *
- * This source code is the property of RAW Labs S.A. It contains
- * proprietary and confidential information that is protected by applicable
- * intellectual property and other laws. Unauthorized use, reproduction,
- * or distribution of this code, or any portion of it, may result in severe
- * civil and criminal penalties and will be prosecuted to the maximum
- * extent possible under the law.
+ * Use of this software is governed by the Business Source License
+ * included in the file licenses/BSL.txt.
+ *
+ * As of the Change Date specified in that file, in accordance with
+ * the Business Source License, use of this software will be governed
+ * by the Apache License, Version 2.0, included in the file
+ * licenses/APL.txt.
  */
 
 package com.rawlabs.das.salesforce
@@ -15,7 +15,8 @@ package com.rawlabs.das.salesforce
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
 import com.rawlabs.protocol.raw.{BoolType, DoubleType, RecordType, StringType, TimestampType, Type}
 
-class DASSalesforceAccountTable(connector: DASSalesforceConnector) extends DASSalesforceTable(connector, "salesforce_account", "Account") {
+class DASSalesforceAccountTable(connector: DASSalesforceConnector)
+    extends DASSalesforceTable(connector, "salesforce_account", "Account") {
 
   // TODO (msb): Add helper methods to create the table definition
   // TODO (msb): Add dynamic columns based on the Salesforce schema
