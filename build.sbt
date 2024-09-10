@@ -130,15 +130,15 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-salesforce-server",
-    "image-type" -> "final"
+    "image-type" -> "final",
+    "org.opencontainers.image.source" -> "https://github.com/raw-labs/das-salesforce"
   ),
   Docker / daemonUser := "raw",
   dockerExposedVolumes := Seq("/var/log/raw"),
-  dockerExposedPorts := Seq(54322),
+  dockerExposedPorts := Seq(50051),
   dockerEnvVars := Map("PATH" -> s"${(Docker / defaultLinuxInstallLocation).value}/bin:$$PATH"),
   // We remove the automatic switch to USER 1001:0.
   // We we want to run as root to install the JDK, also later we will switch to a non-root user.
-  // We will switch to a non-root user later in the Dockerfile.
   dockerCommands := dockerCommands.value.filterNot {
     case Cmd("USER", args @ _*) => args.contains("1001:0")
     case cmd => false
@@ -160,10 +160,6 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       "USER",
       "raw"
     ),
-    Cmd(
-      "HEALTHCHECK",
-      "--interval=3s --timeout=1s CMD curl --silent --head --fail http://localhost:54322/health || exit 1"
-    )
   ),
   dockerEnvVars += "LANG" -> "C.UTF-8",
   dockerEnvVars += "JAVA_HOME" -> "/usr/lib/jvm/java-21-amazon-corretto",
@@ -201,7 +197,7 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
   Docker / dockerAutoremoveMultiStageIntermediateImages := false,
   dockerAlias := dockerAlias.value.withTag(Option(version.value.replace("+", "-"))),
   dockerAliases := {
-    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", "ghcr.io/raw-labs/raw")
+    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", "ghcr.io/raw-labs/das-salesforce")
     val releaseRegistry = sys.env.get("RELEASE_DOCKER_REGISTRY")
     val baseAlias = dockerAlias.value.withRegistryHost(Some(devRegistry))
 
