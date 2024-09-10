@@ -130,7 +130,8 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-salesforce-server",
-    "image-type" -> "final"
+    "image-type" -> "final",
+    "org.opencontainers.image.source" -> "https://github.com/raw-labs/das-salesforce"
   ),
   Docker / daemonUser := "raw",
   dockerExposedVolumes := Seq("/var/log/raw"),
