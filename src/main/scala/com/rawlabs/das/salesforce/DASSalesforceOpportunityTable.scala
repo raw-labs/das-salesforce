@@ -13,7 +13,7 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, DoubleType, RecordType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.raw.{BoolType, DoubleType, IntType, StringType, TimestampType, Type}
 
 class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_opportunity", "Opportunity") {
@@ -128,7 +128,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("fiscal_quarter")
           .setDescription("Represents the fiscal quarter. Valid values are 1, 2, 3, or 4.")
-          .setType(Type.newBuilder().setInt(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(Type.newBuilder().setInt(IntType.newBuilder().setTriable(false).setNullable(true)).build())
           .build()
       )
       .addColumns(
@@ -136,7 +136,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("fiscal_year")
           .setDescription("Represents the fiscal year, for example, 2006.")
-          .setType(Type.newBuilder().setInt(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(Type.newBuilder().setInt(IntType.newBuilder().setTriable(false).setNullable(true)).build())
           .build()
       )
       .addColumns(

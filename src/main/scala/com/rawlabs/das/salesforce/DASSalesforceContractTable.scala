@@ -13,7 +13,7 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, DoubleType, IntType, RecordType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.raw.{BoolType, IntType, RecordType, StringType, TimestampType, Type}
 
 class DASSalesforceContractTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_contract", "Contract") {

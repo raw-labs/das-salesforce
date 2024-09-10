@@ -13,7 +13,7 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, DoubleType, RecordType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, Type}
 
 class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_opportunity_contact_role", "OpportunityContactRole") {

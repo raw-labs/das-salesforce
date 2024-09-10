@@ -13,7 +13,7 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, DoubleType, RecordType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.raw.{BoolType, StringType, Type}
 
 class DASSalesforceObjectPermissionTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_object_permission", "ObjectPermissions") {
