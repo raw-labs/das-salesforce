@@ -33,4 +33,4 @@ jobs:
         password: ${{ secrets.WRITE_PACKAGES }}
         logout: false
     - name: publish docker images
-      run: .github/scripts/dnd-sbt Docker/publishLocal
+      run: .github/scripts/dnd-sbt docker/Docker/publish

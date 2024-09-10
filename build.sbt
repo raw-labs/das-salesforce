@@ -201,7 +201,7 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
   Docker / dockerAutoremoveMultiStageIntermediateImages := false,
   dockerAlias := dockerAlias.value.withTag(Option(version.value.replace("+", "-"))),
   dockerAliases := {
-    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", "ghcr.io/raw-labs/raw")
+    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", "ghcr.io/raw-labs/das-salesforce")
     val releaseRegistry = sys.env.get("RELEASE_DOCKER_REGISTRY")
     val baseAlias = dockerAlias.value.withRegistryHost(Some(devRegistry))
 
