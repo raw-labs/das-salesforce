@@ -34,5 +34,6 @@ jobs:
   docker-buid:
     runs-on: self-hosted
     steps:
+      - run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
       - run: .github/scripts/dnd-sbt docker/Docker/publishLocal
