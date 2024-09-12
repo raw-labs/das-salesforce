@@ -18,10 +18,8 @@ import com.rawlabs.protocol.raw.{BoolType, RecordType, StringType, TimestampType
 class DASSalesforceContactTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_contact", "Contact") {
 
-  // TODO (msb): Add helper methods to create the table definition
-  // TODO (msb): Add dynamic columns based on the Salesforce schema
   override def tableDefinition: TableDefinition = {
-    TableDefinition
+    var tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
@@ -250,7 +248,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
       .addColumns(
         ColumnDefinition
           .newBuilder()
-          .setName("last_cu_request_date")
+          .setName("last_c_u_request_date")
           .setDescription("The Last Stay-in-Touch Request Date.")
           .setType(
             Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
@@ -260,7 +258,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
       .addColumns(
         ColumnDefinition
           .newBuilder()
-          .setName("last_cu_update_date")
+          .setName("last_c_u_update_date")
           .setDescription("The Last Stay-in-Touch Save Date.")
           .setType(
             Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
@@ -386,18 +384,8 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
           .build()
       )
       .setStartupCost(1000)
-      .build()
+    tbl = addDynamicColumns(tbl)
+    tbl.build()
   }
-
-  override protected val fieldsCannotBeUpdated: Seq[String] = Seq(
-    "id",
-    "last_modified_date",
-    "billing_address",
-    "created_by_id",
-    "is_deleted",
-    "shipping_address",
-    "created_date",
-    "last_modified_by_id"
-  )
 
 }

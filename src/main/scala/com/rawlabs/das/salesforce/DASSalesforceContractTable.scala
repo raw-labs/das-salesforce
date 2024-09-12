@@ -18,10 +18,8 @@ import com.rawlabs.protocol.raw.{BoolType, IntType, RecordType, StringType, Time
 class DASSalesforceContractTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_contract", "Contract") {
 
-  // TODO (msb): Add helper methods to create the table definition
-  // TODO (msb): Add dynamic columns based on the Salesforce schema
   override def tableDefinition: TableDefinition = {
-    TableDefinition
+    var tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
@@ -304,18 +302,8 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
           .build()
       )
       .setStartupCost(1000)
-      .build()
+    tbl = addDynamicColumns(tbl)
+    tbl.build()
   }
-
-  override protected val fieldsCannotBeUpdated: Seq[String] = Seq(
-    "id",
-    "billing_address",
-    "shipping_address",
-    "is_deleted",
-    "created_by_id",
-    "created_date",
-    "last_modified_by_id",
-    "last_modified_date"
-  )
 
 }

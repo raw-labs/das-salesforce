@@ -217,11 +217,11 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
 
 lazy val docker = (project in file("docker"))
   .dependsOn(
-    root
+    root % "compile->compile;test->test"
   )
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(
-    buildSettings,
+    strictBuildSettings,
     dockerSettings,
     libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.1.0" % "compile->compile;test->test"
   )
