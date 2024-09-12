@@ -19,7 +19,7 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_asset", "Asset") {
 
   override def tableDefinition: TableDefinition = {
-var tbl=    TableDefinition
+    var tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
