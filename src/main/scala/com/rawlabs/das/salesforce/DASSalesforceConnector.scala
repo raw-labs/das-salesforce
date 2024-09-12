@@ -20,8 +20,6 @@ import com.fasterxml.jackson.module.scala.{ClassTagExtensions, DefaultScalaModul
 import com.force.api.{ApiConfig, ForceApi}
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.collection.JavaConverters._
-
 class DASSalesforceConnector(options: Map[String, String]) extends StrictLogging {
 
   private val jsonMapper = new ObjectMapper with ClassTagExtensions {
@@ -31,22 +29,15 @@ class DASSalesforceConnector(options: Map[String, String]) extends StrictLogging
     registerModule(DefaultScalaModule)
   }
 
-  // TODO (msb): Add these dynamically?
   private val apiConfig = new ApiConfig()
     .setApiVersionString(options("api_version"))
     .setUsername(options("username"))
     .setPassword(options("password") + options("security_token"))
     .setClientId(options("client_id"))
-    //.setClientSecret(options("client_secret"))
     .setForceURL(options("url"))
     .setObjectMapper(jsonMapper)
 
   val forceApi = new ForceApi(apiConfig)
 
-  val x = forceApi.describeGlobal()
-//  x.getSObjects.asScala.foreach(sObject => logger.debug(sObject.getName))
-  logger.debug(x.toString)
-  val y = forceApi.describeSObject("Customer_Feedback__c")
-  y.getFields.asScala.foreach(field => logger.debug(s"${field.getName} -> ${field.getType}"))
-  logger.debug(y.toString)
+  val addDynamicColumns = options.getOrElse("add_dynamic_columns", "true").toBoolean
 }

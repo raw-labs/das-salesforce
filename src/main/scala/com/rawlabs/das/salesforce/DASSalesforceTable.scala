@@ -13,8 +13,19 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.das.sdk.{DASExecuteResult, DASTable}
-import com.rawlabs.protocol.das.{Qual, Row, SortKey, TableDefinition}
+import com.rawlabs.protocol.das.{ColumnDefinition, Qual, Row, SortKey, TableDefinition}
 import com.rawlabs.protocol.raw.{
+  BinaryType,
+  BoolType,
+  DateType,
+  DecimalType,
+  DoubleType,
+  IntType,
+  LongType,
+  RecordType,
+  StringType,
+  TimestampType,
+  Type,
   Value,
   ValueBool,
   ValueDouble,
@@ -43,7 +54,87 @@ abstract class DASSalesforceTable(
 
   def tableDefinition: TableDefinition
 
-  protected def fieldsCannotBeUpdated: Seq[String] = Seq(uniqueColumn)
+  protected def fieldsCannotBeUpdated: Seq[String] = Seq(
+    "id",
+    "is_deleted",
+    "created_by_id",
+    "created_date",
+    "last_modified_by_id",
+    "last_modified_date",
+    "system_modstamp"
+  )
+
+  private def readOnlyFields: Seq[String] = {
+    if (uniqueColumn.nonEmpty) {
+      fieldsCannotBeUpdated :+ uniqueColumn
+    } else {
+      fieldsCannotBeUpdated
+    }
+  }
+
+  // Add dynamic columns based on the Salesforce schema.
+  // This is done by reading the schema from Salesforce and adding columns that are not already in the table.
+  // Columns already in the table are defined statically so they have better documentation.
+  def addDynamicColumns(tbl: TableDefinition.Builder): TableDefinition.Builder = {
+    if (!connector.addDynamicColumns) {
+      return tbl
+    }
+    var t = tbl
+    val staticColumns = tbl.getColumnsList.asScala.map(_.getName).toSet
+//    logger.debug(s"Static columns: $staticColumns")
+    readColumnsFromTable().foreach { c =>
+      // If not already in the table, add it.
+      if (!staticColumns.contains(c.getName)) {
+//        logger.debug(s"Adding dynamic column: ${c.getName}")
+        t = t.addColumns(c)
+      }
+    }
+    t
+  }
+
+  def readColumnsFromTable(): Seq[ColumnDefinition] = {
+    val obj = connector.forceApi.describeSObject(salesforceObjectName)
+    obj.getFields.asScala.map { f =>
+      val rawType = f.getType match {
+        case "string" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "id" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "reference" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "date" => Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "datetime" =>
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "picklist" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "boolean" => Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "textarea" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "currency" =>
+          Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "percent" =>
+          Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "double" =>
+          Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "int" => Type.newBuilder().setInt(IntType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "long" => Type.newBuilder().setLong(LongType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "address" => Type.newBuilder().setRecord(RecordType.newBuilder()).build()
+        case "base64" =>
+          Type.newBuilder().setBinary(BinaryType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "time" =>
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "phone" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "url" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "email" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case _ => throw new IllegalArgumentException(s"Unsupported type: ${f.getType}")
+      }
+      ColumnDefinition
+        .newBuilder()
+        .setName(renameFromSalesforce(f.getName))
+        .setDescription(f.getLabel)
+        .setType(rawType)
+        .build()
+    }
+  }
 
   override def getRelSize(quals: Seq[Qual], columns: Seq[String]): (Int, Int) = (100, 100)
 
@@ -67,7 +158,8 @@ abstract class DASSalesforceTable(
       maybeSortKeys: Option[Seq[SortKey]],
       maybeLimit: Option[Long]
   ): DASExecuteResult = {
-    val salesforceColumns = columns.map(renameToSalesforce)
+    logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $maybeSortKeys, limit: $maybeLimit")
+    val salesforceColumns = columns.distinct.map(renameToSalesforce)
 
     var soql = {
       if (salesforceColumns.isEmpty) {
@@ -190,7 +282,7 @@ abstract class DASSalesforceTable(
   override def update(rowId: Value, newValues: Row): Row = {
     val id = rowId.getString.getV
     val newData = newValues.getDataMap.asScala
-      .filter(kv => !fieldsCannotBeUpdated.contains(kv._1))
+      .filter(kv => !readOnlyFields.contains(kv._1))
       .map { case (k, v) => renameToSalesforce(k) -> rawValueToJavaValue(v) }
       .toMap
     logger.debug(s"Updating row with id $id and new values: $newData")
