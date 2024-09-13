@@ -184,7 +184,7 @@ abstract class DASSalesforceTable(
               assert(op.hasNotEquals)
               "<>"
             }
-          q.getFieldName + " " + soqlOp + " " + rawValueToSOQLValue(q.getSimpleQual.getValue)
+          renameToSalesforce(q.getFieldName) + " " + soqlOp + " " + rawValueToSOQLValue(q.getSimpleQual.getValue)
         }
         .mkString(" AND ")
     }
@@ -193,7 +193,7 @@ abstract class DASSalesforceTable(
         .map { sk =>
           val order = if (sk.getIsReversed) "DESC" else "ASC"
           val nulls = if (sk.getNullsFirst) "NULLS FIRST" else "NULLS LAST"
-          sk.getName + " " + order + " " + nulls
+          renameToSalesforce(sk.getName) + " " + order + " " + nulls
         }
         .mkString(", ")
     }
@@ -313,14 +313,35 @@ abstract class DASSalesforceTable(
   }
 
   private def rawValueToSOQLValue(v: Value): String = {
-    if (v.hasInt) v.getInt.getV.toString
-    else if (v.hasDouble) v.getDouble.getV.toString
-    else if (v.hasString) {
+    if (v.hasInt) {
+      v.getInt.getV.toString
+    } else if (v.hasLong) {
+      v.getLong.getV.toString
+    } else if (v.hasDouble) {
+      v.getDouble.getV.toString
+    } else if (v.hasDecimal) {
+      v.getDecimal.getV.toString
+    } else if (v.hasString) {
       // Quote string safely for ', including escaping quotes
       "'" + v.getString.getV.replace("'", "\\'") + "'"
-    } else if (v.hasBool) v.getBool.getV.toString
-    else if (v.hasNull) "NULL"
-    else if (v.hasTimestamp) {
+    } else if (v.hasBool) {
+      v.getBool.getV.toString
+    } else if (v.hasNull) {
+      "NULL"
+    } else if (v.hasTime) {
+      // Format time as ISO 8601
+      val hour = v.getTime.getHour
+      val minute = v.getTime.getMinute
+      val second = v.getTime.getSecond
+      val nano = v.getTime.getNano
+      f"$hour%02d:$minute%02d:$second%02d.$nano%09dZ"
+    } else if (v.hasDate) {
+      // Format date as ISO 8601
+      val year = v.getDate.getYear
+      val month = v.getDate.getMonth
+      val day = v.getDate.getDay
+      f"$year%04d-$month%02d-$day%02d"
+    } else if (v.hasTimestamp) {
       // Format timestamp as ISO 8601
       val year = v.getTimestamp.getYear
       val month = v.getTimestamp.getMonth
@@ -329,9 +350,7 @@ abstract class DASSalesforceTable(
       val minute = v.getTimestamp.getMinute
       val second = v.getTimestamp.getSecond
       val nano = v.getTimestamp.getNano
-      // Salesforce expects the timestamp to be in UTC
-      val formatted = f"'$year%04d-$month%02d-$day%02dT$hour%02d:$minute%02d:$second%02d.$nano%09dZ'"
-      formatted
+      f"$year%04d-$month%02d-$day%02dT$hour%02d:$minute%02d:$second%02d.$nano%09dZ"
     } else {
       throw new IllegalArgumentException(s"Unsupported value: $v")
     }
