@@ -159,7 +159,7 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     Cmd(
       "USER",
       "raw"
-    ),
+    )
   ),
   dockerEnvVars += "LANG" -> "C.UTF-8",
   dockerEnvVars += "JAVA_HOME" -> "/usr/lib/jvm/java-21-amazon-corretto",
@@ -219,5 +219,5 @@ lazy val docker = (project in file("docker"))
   .settings(
     strictBuildSettings,
     dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.1.0" % "compile->compile;test->test"
+    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.1.1" % "compile->compile;test->test"
   )

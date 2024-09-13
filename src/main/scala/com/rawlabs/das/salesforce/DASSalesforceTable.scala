@@ -210,26 +210,6 @@ abstract class DASSalesforceTable(
       readChunk()
 
       private def readChunk(): Unit = {
-        def convertAnyToValue(any: Any): Value = {
-          any match {
-            case null => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
-            case s: String => Value.newBuilder().setString(ValueString.newBuilder().setV(s).build()).build()
-            case i: Int => Value.newBuilder().setInt(ValueInt.newBuilder().setV(i).build()).build()
-            case d: Double => Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(d).build()).build()
-            case b: Boolean => Value.newBuilder().setBool(ValueBool.newBuilder().setV(b).build()).build()
-            case m: Map[_, _] =>
-              val record = ValueRecord.newBuilder()
-              m.foreach {
-                case (k: String, v) =>
-                  record.addFields(ValueRecordField.newBuilder().setName(k).setValue(convertAnyToValue(v)).build())
-              }
-              Value.newBuilder().setRecord(record.build()).build()
-            case t =>
-              logger.error(s"Unsupported type: ${t.getClass} (type = ${t.getClass})")
-              throw new IllegalArgumentException(s"Unsupported type: ${t.getClass}")
-          }
-        }
-
         currentChunk.clear()
         currentChunkIndex = 0
         query.getRecords.asScala.foreach { record =>
@@ -237,7 +217,7 @@ abstract class DASSalesforceTable(
           salesforceColumns.zipWithIndex.foreach {
             case (salesforceColumn, idx) =>
               val salesforceValue = record.get(salesforceColumn)
-              row.putData(columns(idx), convertAnyToValue(salesforceValue))
+              row.putData(columns(idx), soqlValueToRawValue(salesforceValue))
           }
           currentChunk += row.build()
         }
@@ -309,6 +289,26 @@ abstract class DASSalesforceTable(
     else {
       val parts = name.split("(?=[A-Z0-9])")
       parts.mkString("_").toLowerCase
+    }
+  }
+
+  private def soqlValueToRawValue(v: Any): Value = {
+    v match {
+      case null => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
+      case s: String => Value.newBuilder().setString(ValueString.newBuilder().setV(s).build()).build()
+      case i: Int => Value.newBuilder().setInt(ValueInt.newBuilder().setV(i).build()).build()
+      case d: Double => Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(d).build()).build()
+      case b: Boolean => Value.newBuilder().setBool(ValueBool.newBuilder().setV(b).build()).build()
+      case m: Map[_, _] =>
+        val record = ValueRecord.newBuilder()
+        m.foreach {
+          case (k: String, v) =>
+            record.addFields(ValueRecordField.newBuilder().setName(k).setValue(soqlValueToRawValue(v)).build())
+        }
+        Value.newBuilder().setRecord(record.build()).build()
+      case t =>
+        logger.error(s"Unsupported type: ${t.getClass} (type = ${t.getClass})")
+        throw new IllegalArgumentException(s"Unsupported type: ${t.getClass}")
     }
   }
 
