@@ -109,6 +109,8 @@ abstract class DASSalesforceTable(
         case "boolean" => Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build()
         case "textarea" =>
           Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "combobox" =>
+          Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
         case "currency" =>
           Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
         case "percent" =>
