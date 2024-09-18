@@ -37,6 +37,8 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
   private val pricebookTable = new DASSalesforcePricebookTable(connector)
   private val productTable = new DASSalesforceProductTable(connector)
   private val userTable = new DASSalesforceUserTable(connector)
+  private val taskTable = new DASSalesforceTaskTable(connector)
+  private val opportunityLineItemTable = new DASSalesforceOpportunityLineItemTable(connector)
   private val staticTables = Seq(
     accountContactRoleTable,
     accountTable,
@@ -52,7 +54,9 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
     permissionSetTable,
     pricebookTable,
     productTable,
-    userTable
+    userTable,
+    taskTable,
+    opportunityLineItemTable
   )
 
   private val dynamicTableNames = options.get("dynamic_objects").map(_.split(",").toSeq).getOrElse(Seq.empty)
