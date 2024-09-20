@@ -47,6 +47,8 @@ abstract class DASSalesforceTable(
 ) extends DASTable
     with StrictLogging {
 
+  import DASSalesforceUtils._
+
   assert(
     salesforceObjectName.capitalize == salesforceObjectName,
     "Salesforce object name must be capitalized as per Salesforce API"
@@ -275,23 +277,6 @@ abstract class DASSalesforceTable(
   override def delete(rowId: Value): Unit = {
     val id = rowId.getString.getV
     connector.forceApi.deleteSObject(salesforceObjectName, id)
-  }
-
-  // Convert e.g. account_number to AccountNumber
-  // This only works because Salesforce native fields never have underscores
-  protected def renameToSalesforce(name: String): String = {
-    if (name.endsWith("__c")) name // Custom objects must be left as is
-    else name.split("_").map(_.capitalize).mkString
-  }
-
-  // Convert e.g. Price2Book to price_2_book
-  // This only works because Salesforce native fields never have underscores
-  protected def renameFromSalesforce(name: String): String = {
-    if (name.endsWith("__c")) name // Custom objects must be left as is
-    else {
-      val parts = name.split("(?=[A-Z0-9])")
-      parts.mkString("_").toLowerCase
-    }
   }
 
   private def soqlValueToRawValue(v: Any): Value = {
