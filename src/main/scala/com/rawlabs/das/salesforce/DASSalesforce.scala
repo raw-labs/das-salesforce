@@ -59,7 +59,18 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
     opportunityLineItemTable
   )
 
-  private val dynamicTableNames = options.get("dynamic_objects").map(_.split(",").toSeq).getOrElse(Seq.empty)
+  private val dynamicTableNames = {
+    options.get("dynamic_objects") match {
+      case Some(objectNames) =>
+        val objs = objectNames.strip()
+        if (objs.isEmpty) {
+          Seq.empty
+        } else {
+          objs.split(",").map(_.strip).toSeq
+        }
+      case None => Seq.empty
+    }
+  }
 
   logger.debug(s"Dynamic tables: $dynamicTableNames")
   connector.forceApi.describeGlobal().getSObjects.asScala.foreach(sObject => logger.debug(sObject.getName))
