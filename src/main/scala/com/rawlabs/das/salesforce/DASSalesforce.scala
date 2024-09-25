@@ -66,7 +66,7 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
         if (objs.isEmpty) {
           Seq.empty
         } else {
-          objs.split(",").map(_.strip).toSeq
+          objs.split(",").map(_.strip).filter(_.nonEmpty).toSeq
         }
       case None => Seq.empty
     }
