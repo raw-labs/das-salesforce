@@ -116,7 +116,7 @@ lazy val root = (project in file("."))
       "com.raw-labs" %% "das-sdk-scala" % "0.1.0" % "compile->compile;test->test",
       "com.frejo" % "force-rest-api" % "0.0.45",
       "joda-time" % "joda-time" % "2.12.7",
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.12.7"
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.17.2"
     )
   )
 
