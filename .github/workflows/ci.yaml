@@ -32,7 +32,9 @@ jobs:
       options: --user 1001:1001
     steps:
       - uses: actions/checkout@v4
-      - run: sbt clean test
+      - run: |
+          env
+          sbt clean test
   docker-buid:
     runs-on: self-hosted
     steps:
