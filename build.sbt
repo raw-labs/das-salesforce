@@ -113,7 +113,7 @@ lazy val root = (project in file("."))
     strictBuildSettings,
     publishSettings,
     libraryDependencies ++= Seq(
-      "com.raw-labs" %% "das-sdk-scala" % "0.1.0" % "compile->compile;test->test",
+      "com.raw-labs" %% "das-sdk-scala" % "0.1.3" % "compile->compile;test->test",
       "com.frejo" % "force-rest-api" % "0.0.45",
       "joda-time" % "joda-time" % "2.12.7",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.12.7"
@@ -219,5 +219,5 @@ lazy val docker = (project in file("docker"))
   .settings(
     strictBuildSettings,
     dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.1.3" % "compile->compile;test->test"
+    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.1.5" % "compile->compile;test->test"
   )

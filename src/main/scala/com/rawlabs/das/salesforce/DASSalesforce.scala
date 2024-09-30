@@ -16,8 +16,6 @@ import com.rawlabs.das.sdk._
 import com.rawlabs.protocol.das._
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.collection.JavaConverters._
-
 class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogging {
 
   private val connector = new DASSalesforceConnector(options)
@@ -85,7 +83,6 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
   }
 
   logger.debug(s"Dynamic tables: $dynamicTableNames")
-  connector.forceApi.describeGlobal().getSObjects.asScala.foreach(sObject => logger.debug(sObject.getName))
 
   private val dynamicTables = dynamicTableNames.map(name => new DASSalesforceDynamicTable(connector, name))
 
