@@ -16,7 +16,7 @@ import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
 import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, Type}
 
 class DASSalesforceContentDocumentLinkTable(connector: DASSalesforceConnector)
-  extends DASSalesforceTable(connector, "salesforce_content_document_link", "ContentDocumentLink") {
+    extends DASSalesforceTable(connector, "salesforce_content_document_link", "ContentDocumentLink") {
 
   override def tableDefinition: TableDefinition = {
     var tbl = TableDefinition
@@ -62,7 +62,9 @@ class DASSalesforceContentDocumentLinkTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("system_modstamp")
           .setDescription("The system modstamp for the content document link.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(

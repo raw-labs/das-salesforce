@@ -13,10 +13,10 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, IntType, Type}
+import com.rawlabs.protocol.raw.{BoolType, IntType, StringType, TimestampType, Type}
 
 class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
-  extends DASSalesforceTable(connector, "salesforce_content_document", "ContentDocument") {
+    extends DASSalesforceTable(connector, "salesforce_content_document", "ContentDocument") {
 
   override def tableDefinition: TableDefinition = {
     var tbl = TableDefinition
@@ -46,7 +46,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("created_date")
           .setDescription("The date and time when the document was created.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -62,7 +64,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_modified_date")
           .setDescription("The date and time when the document was last modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -86,7 +90,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("archived_date")
           .setDescription("The date when the document was archived.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -110,7 +116,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("system_modstamp")
           .setDescription("The system modstamp of the document.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -150,7 +158,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_viewed_date")
           .setDescription("The date and time when the document was last viewed.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -158,7 +168,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_referenced_date")
           .setDescription("The date and time when the document was last referenced.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -214,7 +226,9 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("content_modified_date")
           .setDescription("The date and time when the document content was last modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(

@@ -13,10 +13,10 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, IntType, Type}
+import com.rawlabs.protocol.raw.{BoolType, IntType, StringType, TimestampType, Type}
 
 class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
-  extends DASSalesforceTable(connector, "salesforce_content_version", "ContentVersion") {
+    extends DASSalesforceTable(connector, "salesforce_content_version", "ContentVersion") {
 
   override def tableDefinition: TableDefinition = {
     var tbl = TableDefinition
@@ -142,7 +142,9 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("content_modified_date")
           .setDescription("The date and time when the content was last modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -182,7 +184,9 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("featured_content_date")
           .setDescription("The date when the content was featured.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -206,7 +210,9 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("created_date")
           .setDescription("The date and time the content version was created.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -222,7 +228,9 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_modified_date")
           .setDescription("The date and time the content version was last modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -230,7 +238,9 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("system_modstamp")
           .setDescription("The system modstamp for the content version.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
