@@ -16,7 +16,7 @@ import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
 import com.rawlabs.protocol.raw._
 
 class DASSalesforceEventTable(connector: DASSalesforceConnector)
-  extends DASSalesforceTable(connector, "salesforce_event", "Event") {
+    extends DASSalesforceTable(connector, "salesforce_event", "Event") {
 
   override def tableDefinition: TableDefinition = {
     var tbl = TableDefinition
@@ -78,7 +78,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("activity_date_time")
           .setDescription("Due Date and Time of the event.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -86,7 +88,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("activity_date")
           .setDescription("Due Date of the event.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -102,7 +106,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("start_date_time")
           .setDescription("Start date and time of the event.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -110,7 +116,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("end_date_time")
           .setDescription("End date and time of the event.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -166,7 +174,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("created_date")
           .setDescription("The date and time the event was created.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -182,7 +192,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_modified_date")
           .setDescription("The last date and time the event was modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -198,7 +210,9 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("system_modstamp")
           .setDescription("System Modstamp of the event.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .setStartupCost(1000)

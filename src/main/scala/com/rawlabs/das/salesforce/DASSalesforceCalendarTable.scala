@@ -16,7 +16,7 @@ import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
 import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, Type}
 
 class DASSalesforceCalendarTable(connector: DASSalesforceConnector)
-  extends DASSalesforceTable(connector, "salesforce_calendar", "Calendar") {
+    extends DASSalesforceTable(connector, "salesforce_calendar", "Calendar") {
 
   override def tableDefinition: TableDefinition = {
     var tbl = TableDefinition
@@ -70,7 +70,9 @@ class DASSalesforceCalendarTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("created_date")
           .setDescription("The date and time when the calendar was created.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -86,7 +88,9 @@ class DASSalesforceCalendarTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_modified_date")
           .setDescription("The date and time when the calendar was last modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -102,7 +106,9 @@ class DASSalesforceCalendarTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("system_modstamp")
           .setDescription("The system modstamp of the calendar.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .setStartupCost(1000)

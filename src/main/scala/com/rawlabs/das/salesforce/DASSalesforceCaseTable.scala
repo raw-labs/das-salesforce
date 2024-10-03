@@ -16,7 +16,7 @@ import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
 import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, Type}
 
 class DASSalesforceCaseTable(connector: DASSalesforceConnector)
-  extends DASSalesforceTable(connector, "salesforce_case", "Case") {
+    extends DASSalesforceTable(connector, "salesforce_case", "Case") {
 
   override def tableDefinition: TableDefinition = {
     var tbl = TableDefinition
@@ -198,7 +198,9 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("closed_date")
           .setDescription("The date and time the case was closed.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -222,7 +224,9 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("created_date")
           .setDescription("The date and time the case was created.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -238,7 +242,9 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_modified_date")
           .setDescription("The date and time the case was last modified.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -254,7 +260,9 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("system_modstamp")
           .setDescription("The system modstamp for the case.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -302,7 +310,9 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_viewed_date")
           .setDescription("The date and time the case was last viewed.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .addColumns(
@@ -310,7 +320,9 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
           .newBuilder()
           .setName("last_referenced_date")
           .setDescription("The date and time the case was last referenced.")
-          .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build())
+          .setType(
+            Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          )
           .build()
       )
       .setStartupCost(1000)
@@ -320,4 +332,3 @@ class DASSalesforceCaseTable(connector: DASSalesforceConnector)
   }
 
 }
-
