@@ -172,9 +172,9 @@ abstract class DASSalesforceTable(
         "SELECT " + salesforceColumns.mkString(", ") + " FROM " + salesforceObjectName
       }
     }
-    val simpleQuals = quals.filter(_.hasSimpleQual) // Only simple quals are supported
-    if (simpleQuals.nonEmpty) {
-      soql += " WHERE " + quals
+    val (supportedQuals, unsupportedQuals) = quals.partition(_.hasSimpleQual) // Only simple quals are supported
+    if (supportedQuals.nonEmpty) {
+      soql += " WHERE " + supportedQuals
         .map { q =>
           assert(q.hasSimpleQual, "Only simple quals are supported")
           val op = q.getSimpleQual.getOperator
@@ -201,8 +201,13 @@ abstract class DASSalesforceTable(
         }
         .mkString(", ")
     }
-    if (maybeLimit.nonEmpty) {
-      soql += " LIMIT " + maybeLimit.get
+    if (unsupportedQuals.isEmpty) {
+      // LIMIT can be pushed _only_ when there are no unsupported quals.
+      if (maybeLimit.nonEmpty) {
+        soql += " LIMIT " + maybeLimit.get
+      }
+    } else {
+      maybeLimit.foreach(_ => logger.warn("Unsupported quals found, ignoring LIMIT"))
     }
     logger.debug(s"Executing SOQL query: $soql")
     var query = connector.forceApi.query(soql)
