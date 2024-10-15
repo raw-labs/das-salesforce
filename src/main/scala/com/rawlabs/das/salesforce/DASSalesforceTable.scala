@@ -74,24 +74,24 @@ abstract class DASSalesforceTable(
     }
   }
 
-  // Add dynamic columns based on the Salesforce schema.
-  // This is done by reading the schema from Salesforce and adding columns that are not already in the table.
-  // Columns already in the table are defined statically so they have better documentation.
-  def addDynamicColumns(tbl: TableDefinition.Builder): TableDefinition.Builder = {
-    if (!connector.addDynamicColumns) {
-      return tbl
+  // Remove hidden columns and add dynamic ones, based on the Salesforce schema.
+  // The staticColumns list is coming from the table definition, where it's hardcoded with good documentation.
+  // The schema returned by Salesforce permits us to discard hidden ones and add dynamic ones.
+  def fixHiddenAndDynamicColumns(staticColumns: Seq[ColumnDefinition]): Seq[ColumnDefinition] = {
+    val finalColumns = mutable.ArrayBuffer.empty[ColumnDefinition]
+    // First filter the provided static columns to keep those _that are in the table schema returned by Salesforce_.
+    val salesforceTableSchema = readColumnsFromTable()
+    val schemaColumns = salesforceTableSchema.map(_.getName).toSet
+    staticColumns
+      .filter(c => schemaColumns.contains(c.getName))
+      .foreach(finalColumns += _)
+    if (connector.addDynamicColumns) {
+      val knownColumns = staticColumns.map(_.getName).toSet
+      // Second, if configured so, add the dynamic columns: columns that were returned in the Salesforce schema
+      // but we haven't picked from the static columns list.
+      salesforceTableSchema.filterNot(c => knownColumns.contains(c.getName)).foreach(finalColumns += _)
     }
-    var t = tbl
-    val staticColumns = tbl.getColumnsList.asScala.map(_.getName).toSet
-//    logger.debug(s"Static columns: $staticColumns")
-    readColumnsFromTable().foreach { c =>
-      // If not already in the table, add it.
-      if (!staticColumns.contains(c.getName)) {
-//        logger.debug(s"Adding dynamic column: ${c.getName}")
-        t = t.addColumns(c)
-      }
-    }
-    t
+    finalColumns
   }
 
   def readColumnsFromTable(): Seq[ColumnDefinition] = {
