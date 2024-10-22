@@ -15,6 +15,7 @@ package com.rawlabs.das.salesforce
 import com.rawlabs.das.sdk.{DASExecuteResult, DASTable}
 import com.rawlabs.protocol.das.{ColumnDefinition, Qual, Row, SortKey, TableDefinition}
 import com.rawlabs.protocol.raw.{
+  AttrType,
   BinaryType,
   BoolType,
   DateType,
@@ -108,6 +109,8 @@ abstract class DASSalesforceTable(
           Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
         case "picklist" =>
           Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "multipicklist" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
         case "boolean" => Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build()
         case "textarea" =>
           Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
@@ -129,7 +132,32 @@ abstract class DASSalesforceTable(
         case "phone" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
         case "url" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
         case "email" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case _ => throw new IllegalArgumentException(s"Unsupported type: ${f.getType}")
+        case "encryptedstring" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "location" => Type
+            .newBuilder()
+            .setRecord(
+              RecordType
+                .newBuilder()
+                .addAtts(
+                  AttrType
+                    .newBuilder()
+                    .setIdn("latitude")
+                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)))
+                )
+                .addAtts(
+                  AttrType
+                    .newBuilder()
+                    .setIdn("longitude")
+                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)))
+                )
+            )
+            .build()
+        case "anyType" =>
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case _ =>
+          logger.warn(s"Unhandled Salesforce field type: ${f.getType}, defaulting to StringType.")
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
       }
       ColumnDefinition
         .newBuilder()
