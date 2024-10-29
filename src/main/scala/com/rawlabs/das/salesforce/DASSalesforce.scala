@@ -2927,10 +2927,10 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
     DASSQLParser.parseSQL(sql) match {
       case Right(query) =>
         val columns = query.select.items.map {
-          case DASSelectColumn(column) => column.name
+          case DASSelectColumn(column) => column.name.replace("\"", "")
           case _ => throw new DASSdkException("Only column names are supported in SELECT clause")
         }
-        val salesforceColumns = columns.map(renameToSalesforce)
+        val salesforceColumns = columns.map(c => renameToSalesforce(c.replace("\"", "")))
 
         val soql = SOQLGenerator.generateSOQL(query)
 
