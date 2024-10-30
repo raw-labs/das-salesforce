@@ -2887,7 +2887,8 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
               .build()
           )
           .build()
-      ) ////////////////////////////
+      )
+      ////////////////////////////
       // !~~ operator
       ////////////////////////////
       .addOperatorsSupported(
@@ -2919,74 +2920,69 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
 
   override def getFunction(name: String): Option[DASFunction] = None
 
-  override def estimateQuery(sql: String): (Int, Int) = {
+  override def estimateQuery(query: DASSQLQuery): (Int, Int) = {
     (1, 1)
   }
 
-  override def executeQuery(sql: String): DASExecuteResult = {
-    DASSQLParser.parseSQL(sql) match {
-      case Right(query) =>
-        val columns = query.select.items.map {
-          case DASSelectColumn(column) => column.name.replace("\"", "")
-          case _ => throw new DASSdkException("Only column names are supported in SELECT clause")
+  override def executeQuery(query: DASSQLQuery): DASExecuteResult = {
+    val columns = query.select.items.map {
+      case DASSelectColumn(column) => column.name.replace("\"", "")
+      case _ => throw new DASSdkException("Only column names are supported in SELECT clause")
+    }
+    val salesforceColumns = columns.map(c => renameToSalesforce(c.replace("\"", "")))
+
+    val soql = SOQLGenerator.generateSOQL(query)
+
+    logger.debug(s"Executing SOQL query: $soql")
+    var soqlQuery = connector.forceApi.query(soql)
+
+    new DASExecuteResult {
+      private val currentChunk: mutable.Buffer[Row] = mutable.Buffer.empty
+      private var currentChunkIndex: Int = 0
+
+      readChunk()
+
+      private def readChunk(): Unit = {
+        currentChunk.clear()
+        currentChunkIndex = 0
+        soqlQuery.getRecords.asScala.foreach { record =>
+          val row = Row.newBuilder()
+          salesforceColumns.zipWithIndex.foreach {
+            case (salesforceColumn, idx) =>
+              val salesforceValue = record.get(salesforceColumn)
+              row.addColumns(
+                Column
+                  .newBuilder()
+                  .setName(columns(idx))
+                  .setData(soqlValueToRawValue(salesforceValue))
+                  .build()
+              )
+          }
+          currentChunk += row.build()
         }
-        val salesforceColumns = columns.map(c => renameToSalesforce(c.replace("\"", "")))
 
-        val soql = SOQLGenerator.generateSOQL(query)
+        if (!soqlQuery.isDone) {
+          soqlQuery = connector.forceApi.queryMore(soqlQuery.getNextRecordsUrl)
+        }
+      }
 
-        logger.debug(s"Executing SOQL query: $soql")
-        var soqlQuery = connector.forceApi.query(soql)
+      override def close(): Unit = {}
 
-        new DASExecuteResult {
-          private val currentChunk: mutable.Buffer[Row] = mutable.Buffer.empty
-          private var currentChunkIndex: Int = 0
+      override def hasNext: Boolean = {
+        currentChunkIndex < currentChunk.size || !soqlQuery.isDone
+      }
 
+      override def next(): Row = {
+        if (!hasNext) throw new NoSuchElementException("No more elements")
+
+        if (currentChunkIndex == currentChunk.size) {
           readChunk()
-
-          private def readChunk(): Unit = {
-            currentChunk.clear()
-            currentChunkIndex = 0
-            soqlQuery.getRecords.asScala.foreach { record =>
-              val row = Row.newBuilder()
-              salesforceColumns.zipWithIndex.foreach {
-                case (salesforceColumn, idx) =>
-                  val salesforceValue = record.get(salesforceColumn)
-                  row.addColumns(
-                    Column
-                      .newBuilder()
-                      .setName(columns(idx))
-                      .setData(soqlValueToRawValue(salesforceValue))
-                      .build()
-                  )
-              }
-              currentChunk += row.build()
-            }
-
-            if (!soqlQuery.isDone) {
-              soqlQuery = connector.forceApi.queryMore(soqlQuery.getNextRecordsUrl)
-            }
-          }
-
-          override def close(): Unit = {}
-
-          override def hasNext: Boolean = {
-            currentChunkIndex < currentChunk.size || !soqlQuery.isDone
-          }
-
-          override def next(): Row = {
-            if (!hasNext) throw new NoSuchElementException("No more elements")
-
-            if (currentChunkIndex == currentChunk.size) {
-              readChunk()
-            }
-
-            val row = currentChunk(currentChunkIndex)
-            currentChunkIndex += 1
-            row
-          }
         }
 
-      case Left(error) => throw new DASSdkException(s"Failed to parse SQL: $error")
+        val row = currentChunk(currentChunkIndex)
+        currentChunkIndex += 1
+        row
+      }
     }
   }
 
