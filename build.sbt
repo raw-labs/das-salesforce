@@ -110,8 +110,7 @@ lazy val root = (project in file("."))
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.15.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.15.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.15.2",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.15.2",
-      "com.github.jsqlparser" % "jsqlparser" % "5.0",
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.15.2"
     )
   )
 

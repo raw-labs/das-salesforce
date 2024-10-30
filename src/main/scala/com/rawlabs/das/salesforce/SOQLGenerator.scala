@@ -13,6 +13,28 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.das.salesforce.DASSalesforceUtils.renameToSalesforce
+import com.rawlabs.das.sdk.{
+  DASBinaryOp,
+  DASBinaryOperator,
+  DASColumn,
+  DASDistinct,
+  DASExpr,
+  DASFrom,
+  DASFunctionCall,
+  DASIdentifier,
+  DASJoin,
+  DASJoinType,
+  DASLongValue,
+  DASSQLQuery,
+  DASSQLTable,
+  DASSelect,
+  DASSelectColumn,
+  DASSelectExpression,
+  DASStringValue,
+  DASUnaryOp,
+  DASUnaryOperator,
+  DASWhere
+}
 
 object SOQLGenerator {
 
