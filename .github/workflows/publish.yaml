@@ -67,7 +67,7 @@ jobs:
           with:
             token: ${{ secrets.RAW_CI_PAT }}
             repository: raw-labs/mvp-deployer
-            event-type: deploy-patch-das-salesforce
+            event-type: das-salesforce-integration-cd
             client-payload: |-
               {
                 "aws_region": "eu-west-1",
