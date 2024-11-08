@@ -104,10 +104,13 @@ lazy val root = (project in file("."))
     strictBuildSettings,
     publishSettings,
     libraryDependencies ++= Seq(
-      "com.raw-labs" %% "das-sdk-scala" % "0.1.3" % "compile->compile;test->test",
+      "com.raw-labs" %% "das-sdk-scala" % "0.1.4" % "compile->compile;test->test",
       "com.frejo" % "force-rest-api" % "0.0.45",
       "joda-time" % "joda-time" % "2.12.7",
-      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.12.7"
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.15.2",
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.15.2",
+      "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.15.2",
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.15.2"
     )
   )
 

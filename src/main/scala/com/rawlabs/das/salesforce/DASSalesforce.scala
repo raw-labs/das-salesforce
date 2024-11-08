@@ -12,6 +12,7 @@
 
 package com.rawlabs.das.salesforce
 
+import com.force.api.ApiException
 import com.rawlabs.das.sdk._
 import com.rawlabs.protocol.das._
 import com.typesafe.scalalogging.StrictLogging
@@ -84,9 +85,21 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
 
   logger.debug(s"Dynamic tables: $dynamicTableNames")
 
+  private val maybeDatedConversionRateTable: Option[DASSalesforceDatedConversionRateTable] = {
+    try {
+      val description = connector.forceApi.describeSObject("DatedConversionRate")
+      logger.info(s"Found DatedConversionRate (${description.getName})")
+      Some(new DASSalesforceDatedConversionRateTable(connector))
+    } catch {
+      case e: ApiException =>
+        logger.warn("DatedConversionRate not found", e)
+        None
+    }
+  }
+
   private val dynamicTables = dynamicTableNames.map(name => new DASSalesforceDynamicTable(connector, name))
 
-  private val allTables = staticTables ++ dynamicTables
+  private val allTables = staticTables ++ dynamicTables ++ maybeDatedConversionRateTable
 
   override def tableDefinitions: Seq[TableDefinition] = allTables.map(_.tableDefinition)
 
