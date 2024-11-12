@@ -12,7 +12,7 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.das.sdk.{DASExecuteResult, DASTable}
+import com.rawlabs.das.sdk.{DASExecuteResult, DASSdkException, DASTable}
 import com.rawlabs.protocol.das.{ColumnDefinition, Qual, Row, SortKey, TableDefinition}
 import com.rawlabs.protocol.raw.{
   AttrType,
@@ -29,15 +29,20 @@ import com.rawlabs.protocol.raw.{
   Type,
   Value,
   ValueBool,
+  ValueDate,
+  ValueDecimal,
   ValueDouble,
   ValueInt,
   ValueNull,
   ValueRecord,
   ValueRecordField,
-  ValueString
+  ValueString,
+  ValueTimestamp
 }
 import com.typesafe.scalalogging.StrictLogging
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
@@ -254,7 +259,9 @@ abstract class DASSalesforceTable(
           salesforceColumns.zipWithIndex.foreach {
             case (salesforceColumn, idx) =>
               val salesforceValue = record.get(salesforceColumn)
-              row.putData(columns(idx), soqlValueToRawValue(salesforceValue))
+              val columnName = columns(idx)
+              val rawType = columnTypes(columnName)
+              row.putData(columnName, soqlValueToRawValue(rawType, salesforceValue))
           }
           currentChunk += row.build()
         }
@@ -312,7 +319,92 @@ abstract class DASSalesforceTable(
     connector.forceApi.deleteSObject(salesforceObjectName, id)
   }
 
-  private def soqlValueToRawValue(v: Any): Value = {
+  private def soqlValueToRawValue(t: Type, v: Any): Value = {
+    if (v == null) Value.newBuilder().setNull(ValueNull.newBuilder()).build()
+    else {
+      if (t.hasInt) Value.newBuilder().setInt(ValueInt.newBuilder().setV(v.asInstanceOf[Int]).build()).build()
+      else if (t.hasDouble) {
+        val value = v match {
+          case d: Double => d
+          case i: Int => i.toDouble
+          case l: Long => l.toDouble
+          case _ => throw new IllegalArgumentException(s"Unsupported value: $v")
+        }
+        Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(value).build()).build()
+      } else if (t.hasDecimal) {
+        val value = v.toString
+        Value.newBuilder().setDecimal(ValueDecimal.newBuilder().setV(value).build()).build()
+      } else if (t.hasString) Value.newBuilder().setString(ValueString.newBuilder().setV(v.toString).build()).build()
+      else if (t.hasBool)
+        Value.newBuilder().setBool(ValueBool.newBuilder().setV(v.asInstanceOf[Boolean]).build()).build()
+      else if (t.hasDate) {
+        val localDate = LocalDate.parse(v.asInstanceOf[String])
+        Value
+          .newBuilder()
+          .setDate(
+            ValueDate
+              .newBuilder()
+              .setYear(localDate.getYear)
+              .setMonth(localDate.getMonthValue)
+              .setDay(localDate.getDayOfMonth)
+              .build()
+          )
+          .build()
+      } else if (t.hasTimestamp) {
+        val str = v.asInstanceOf[String]
+        val localDateTime =
+          try {
+            java.time.LocalDateTime.parse(str, dateTimeFormatter)
+          } catch {
+            case e: java.time.format.DateTimeParseException =>
+              logger.error(s"Failed to parse timestamp: $str", e)
+              try {
+                val date = java.time.LocalDate.parse(str)
+                date.atStartOfDay()
+              } catch {
+                case e: java.time.format.DateTimeParseException =>
+                  logger.error(s"Failed to parse timestamp: $str", e)
+                  throw new DASSdkException(s"Failed to parse timestamp: $str", e)
+              }
+          }
+        Value
+          .newBuilder()
+          .setTimestamp(
+            ValueTimestamp
+              .newBuilder()
+              .setYear(localDateTime.getYear)
+              .setMonth(localDateTime.getMonthValue)
+              .setDay(localDateTime.getDayOfMonth)
+              .setHour(localDateTime.getHour)
+              .setMinute(localDateTime.getMinute)
+              .setSecond(localDateTime.getSecond)
+              .setNano(localDateTime.getNano)
+              .build()
+          )
+          .build()
+      } else if (t.hasRecord) {
+        logger.info(v.toString)
+        val record = v.asInstanceOf[Map[String, Any]]
+        val recordValue = ValueRecord.newBuilder()
+        val typeMap = t.getRecord.getAttsList.asScala.map(att => att.getIdn -> att.getTipe).toMap
+        record.foreach {
+          case (k, v) =>
+            val fieldValue = typeMap.get(k) match {
+              case Some(fieldType) => soqlValueToRawValue(fieldType, v)
+              case None => anySoqlValueToRawValue(v)
+            }
+            recordValue.addFields(ValueRecordField.newBuilder().setName(k).setValue(fieldValue).build())
+        }
+        Value.newBuilder().setRecord(recordValue.build()).build()
+      } else if (t.hasAny) anySoqlValueToRawValue(v)
+      else {
+        logger.error(s"Unsupported type: ${t.getTypeCase}")
+        throw new IllegalArgumentException(s"Unsupported type: ${t.getClass}")
+      }
+    }
+  }
+
+  private def anySoqlValueToRawValue(v: Any): Value = {
     v match {
       case null => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
       case s: String => Value.newBuilder().setString(ValueString.newBuilder().setV(s).build()).build()
@@ -323,7 +415,7 @@ abstract class DASSalesforceTable(
         val record = ValueRecord.newBuilder()
         m.foreach {
           case (k: String, v) =>
-            record.addFields(ValueRecordField.newBuilder().setName(k).setValue(soqlValueToRawValue(v)).build())
+            record.addFields(ValueRecordField.newBuilder().setName(k).setValue(anySoqlValueToRawValue(v)).build())
         }
         Value.newBuilder().setRecord(record.build()).build()
       case t =>
@@ -396,5 +488,10 @@ abstract class DASSalesforceTable(
       throw new IllegalArgumentException(s"Unsupported value: $v")
     }
   }
+
+  private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+
+  private val columnTypes: Map[String, Type] =
+    tableDefinition.getColumnsList.asScala.map(c => c.getName -> c.getType).toMap
 
 }
