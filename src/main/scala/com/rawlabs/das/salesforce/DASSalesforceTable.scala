@@ -16,7 +16,6 @@ import com.rawlabs.das.sdk.{DASExecuteResult, DASSdkException, DASTable}
 import com.rawlabs.protocol.das.{ColumnDefinition, Qual, Row, SortKey, TableDefinition}
 import com.rawlabs.protocol.raw.{
   AttrType,
-  BinaryType,
   BoolType,
   DateType,
   DecimalType,
@@ -131,7 +130,9 @@ abstract class DASSalesforceTable(
         case "long" => Type.newBuilder().setLong(LongType.newBuilder().setTriable(false).setNullable(true)).build()
         case "address" => Type.newBuilder().setRecord(RecordType.newBuilder()).build()
         case "base64" =>
-          Type.newBuilder().setBinary(BinaryType.newBuilder().setTriable(false).setNullable(true)).build()
+          // Salesforce doesn't support base64 fields in SOQL queries. They are strings, not "binary data".
+          // Also the ContentVersion column version_data (base64) is advertised as string.
+          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
         case "time" =>
           Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
         case "phone" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
