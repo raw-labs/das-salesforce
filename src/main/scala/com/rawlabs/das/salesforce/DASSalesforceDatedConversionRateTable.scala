@@ -34,25 +34,27 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
       ColumnDefinition
         .newBuilder()
         .setName("iso_code")
-        .setDescription("Currency Code.")
+        .setDescription("ISO code of the currency (ISO 4217 standard).")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("start_date")
-        .setDescription("Date.")
-        .setType(Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setDescription("The date on which the effective dated exchange rate starts.")
+        .setType(Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("next_start_date")
-        .setDescription("Next Start Date.")
-        .setType(Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setDescription(
+          "The date on which the next effective dated exchange rate will start. Effectively the day after the end date for this exchange rate."
+        )
+        .setType(Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("conversion_rate")
-        .setDescription("Exchange Rate.")
+        .setDescription("Conversion rate of this currency type against the corporate currency.")
         .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(false)).build())
         .build(),
       ColumnDefinition
@@ -60,7 +62,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .setName("created_date")
         .setDescription("Created Date.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(false)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -74,7 +76,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .setName("last_modified_date")
         .setDescription("Last Modified Date.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(false)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -88,7 +90,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .setName("system_modstamp")
         .setDescription("System Modstamp.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(false)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
         )
         .build()
     )
