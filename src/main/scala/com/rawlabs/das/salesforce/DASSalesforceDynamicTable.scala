@@ -26,7 +26,13 @@ class DASSalesforceDynamicTable(connector: DASSalesforceConnector, objectName: S
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(s"Custom object: $objectName.")
-    readColumnsFromTable().foreach(tbl.addColumns)
+    val columns = readColumnsFromTable()
+    columns.foreach { col =>
+      val definition = col.columnDefinition
+      if (col.updatable) markUpdatable(col.columnDefinition.getName)
+      if (col.createable) markCreatable(col.columnDefinition.getName)
+      tbl.addColumns(definition)
+    }
     tbl.build()
   }
 
