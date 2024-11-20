@@ -61,22 +61,15 @@ abstract class DASSalesforceTable(
 
   def tableDefinition: TableDefinition
 
-  protected def fieldsCannotBeUpdated: Seq[String] = Seq(
-    "id",
-    "is_deleted",
-    "created_by_id",
-    "created_date",
-    "last_modified_by_id",
-    "last_modified_date",
-    "system_modstamp"
-  )
+  private val updatableFields = mutable.Set.empty[String]
+  private val creatableFields = mutable.Set.empty[String]
 
-  private def readOnlyFields: Seq[String] = {
-    if (uniqueColumn.nonEmpty) {
-      fieldsCannotBeUpdated :+ uniqueColumn
-    } else {
-      fieldsCannotBeUpdated
-    }
+  protected def markUpdatable(columnName: String): Unit = {
+    updatableFields += columnName
+  }
+
+  protected def markCreatable(columnName: String): Unit = {
+    creatableFields += columnName
   }
 
   // Remove hidden columns and add dynamic ones, based on the Salesforce schema.
@@ -85,8 +78,8 @@ abstract class DASSalesforceTable(
   def fixHiddenAndDynamicColumns(staticColumns: Seq[ColumnDefinition]): Seq[ColumnDefinition] = {
     val finalColumns = mutable.ArrayBuffer.empty[ColumnDefinition]
     // First filter the provided static columns to keep those _that are in the table schema returned by Salesforce_.
-    val salesforceTableSchema = readColumnsFromTable()
-    val schemaColumns = salesforceTableSchema.map(_.getName).toSet
+    val columns = readColumnsFromTable()
+    val schemaColumns = columns.map(_.columnDefinition.getName).toSet
     staticColumns
       .filter(c => schemaColumns.contains(c.getName))
       .foreach(finalColumns += _)
@@ -94,12 +87,18 @@ abstract class DASSalesforceTable(
       val knownColumns = staticColumns.map(_.getName).toSet
       // Second, if configured so, add the dynamic columns: columns that were returned in the Salesforce schema
       // but we haven't picked from the static columns list.
-      salesforceTableSchema.filterNot(c => knownColumns.contains(c.getName)).foreach(finalColumns += _)
+      columns.map(_.columnDefinition).filterNot(c => knownColumns.contains(c.getName)).foreach(finalColumns += _)
+    }
+    columns.foreach { c =>
+      if (c.updatable) markUpdatable(c.columnDefinition.getName)
+      if (c.createable) markCreatable(c.columnDefinition.getName)
     }
     finalColumns
   }
 
-  def readColumnsFromTable(): Seq[ColumnDefinition] = {
+  case class SalesforceColumn(columnDefinition: ColumnDefinition, updatable: Boolean, createable: Boolean)
+
+  def readColumnsFromTable(): Seq[SalesforceColumn] = {
     val obj = connector.forceApi.describeSObject(salesforceObjectName)
     obj.getFields.asScala.map { f =>
       val rawType = f.getType match {
@@ -165,12 +164,13 @@ abstract class DASSalesforceTable(
           logger.warn(s"Unhandled Salesforce field type: ${f.getType}, defaulting to StringType.")
           Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
       }
-      ColumnDefinition
+      val definition = ColumnDefinition
         .newBuilder()
         .setName(renameFromSalesforce(f.getName))
         .setDescription(f.getLabel)
         .setType(rawType)
         .build()
+      SalesforceColumn(definition, updatable = f.isUpdateable, createable = f.isCreateable)
     }
   }
 
@@ -296,6 +296,7 @@ abstract class DASSalesforceTable(
 
   override def insert(row: Row): Row = {
     val newData = row.getDataMap.asScala
+      .filter(kv => creatableFields.contains(kv._1)) // ignore fields that are not creatable
       .map { case (k, v) => renameToSalesforce(k) -> rawValueToJavaValue(v) }
       .filter(_._2 != null)
       .toMap
@@ -307,7 +308,7 @@ abstract class DASSalesforceTable(
   override def update(rowId: Value, newValues: Row): Row = {
     val id = rowId.getString.getV
     val newData = newValues.getDataMap.asScala
-      .filter(kv => !readOnlyFields.contains(kv._1))
+      .filter(kv => updatableFields.contains(kv._1)) // ignore fields that are not updatable
       .map { case (k, v) => renameToSalesforce(k) -> rawValueToJavaValue(v) }
       .toMap
     logger.debug(s"Updating row with id $id and new values: $newData")
@@ -358,13 +359,13 @@ abstract class DASSalesforceTable(
             java.time.LocalDateTime.parse(str, dateTimeFormatter)
           } catch {
             case e: java.time.format.DateTimeParseException =>
-              logger.error(s"Failed to parse timestamp: $str", e)
+              logger.warn(s"Failed to parse timestamp: $str", e)
               try {
                 val date = java.time.LocalDate.parse(str)
                 date.atStartOfDay()
               } catch {
                 case e: java.time.format.DateTimeParseException =>
-                  logger.error(s"Failed to parse timestamp: $str", e)
+                  logger.warn(s"Failed to parse timestamp: $str", e)
                   throw new DASSdkException(s"Failed to parse timestamp: $str", e)
               }
           }
