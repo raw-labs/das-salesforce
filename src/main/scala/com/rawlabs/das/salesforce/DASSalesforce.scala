@@ -100,8 +100,9 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
   private val dynamicTables = dynamicTableNames.map(name => new DASSalesforceDynamicTable(connector, name))
 
   private val allTables = staticTables ++ dynamicTables ++ maybeDatedConversionRateTable
+  private val definitions = allTables.map(_.tableDefinition)
 
-  override def tableDefinitions: Seq[TableDefinition] = allTables.map(_.tableDefinition)
+  override def tableDefinitions: Seq[TableDefinition] = definitions
 
   override def functionDefinitions: Seq[FunctionDefinition] = Seq.empty
 
