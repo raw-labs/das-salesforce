@@ -76,6 +76,7 @@ abstract class DASSalesforceTable(
   // The staticColumns list is coming from the table definition, where it's hardcoded with good documentation.
   // The schema returned by Salesforce permits us to discard hidden ones and add dynamic ones.
   def fixHiddenAndDynamicColumns(staticColumns: Seq[ColumnDefinition]): Seq[ColumnDefinition] = {
+    logger.info(s"Fixing hidden and dynamic columns for table $tableName")
     val finalColumns = mutable.ArrayBuffer.empty[ColumnDefinition]
     // First filter the provided static columns to keep those _that are in the table schema returned by Salesforce_.
     val columns = readColumnsFromTable()
@@ -87,7 +88,10 @@ abstract class DASSalesforceTable(
       val knownColumns = staticColumns.map(_.getName).toSet
       // Second, if configured so, add the dynamic columns: columns that were returned in the Salesforce schema
       // but we haven't picked from the static columns list.
-      columns.map(_.columnDefinition).filterNot(c => knownColumns.contains(c.getName)).foreach(finalColumns += _)
+      columns.map(_.columnDefinition).filterNot(c => knownColumns.contains(c.getName)).foreach { c =>
+        logger.debug(s"Adding dynamic column ${c.getName} to table $tableName")
+        finalColumns += c
+      }
     }
     columns.foreach { c =>
       if (c.updatable) markUpdatable(c.columnDefinition.getName)

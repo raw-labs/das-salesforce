@@ -97,9 +97,22 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
     }
   }
 
+  // PicklistValueInfo might be absent depending on the Salesforce API version.
+  private val maybePickListValueInfoTable: Option[DASSalesforceDynamicTable] = {
+    try {
+      val description = connector.forceApi.describeSObject("PicklistValueInfo")
+      logger.info(s"Found PicklistValueInfo (${description.getName})")
+      Some(new DASSalesforceDynamicTable(connector, "PicklistValueInfo"))
+    } catch {
+      case e: ApiException =>
+        logger.warn("PicklistValueInfo not found", e)
+        None
+    }
+  }
+
   private val dynamicTables = dynamicTableNames.map(name => new DASSalesforceDynamicTable(connector, name))
 
-  private val allTables = staticTables ++ dynamicTables ++ maybeDatedConversionRateTable
+  private val allTables = staticTables ++ dynamicTables ++ maybeDatedConversionRateTable ++ maybePickListValueInfoTable
 
   override def tableDefinitions: Seq[TableDefinition] = allTables.map(_.tableDefinition)
 
