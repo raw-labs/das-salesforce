@@ -100,6 +100,10 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
   private val dynamicTables = dynamicTableNames.map(name => new DASSalesforceDynamicTable(connector, name))
 
   private val allTables = staticTables ++ dynamicTables ++ maybeDatedConversionRateTable
+
+  // These are the table definitions that will be returned to the client. It's stored
+  // in a val to avoid recalculating it every time it's accessed. We do that because we
+  // don't expect the tables to change during the lifetime of the DAS instance.
   private val definitions = allTables.map(_.tableDefinition)
 
   override def tableDefinitions: Seq[TableDefinition] = definitions
