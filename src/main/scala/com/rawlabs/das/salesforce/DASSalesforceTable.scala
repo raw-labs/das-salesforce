@@ -206,11 +206,27 @@ abstract class DASSalesforceTable(
         "SELECT " + salesforceColumns.mkString(", ") + " FROM " + salesforceObjectName
       }
     }
-    val (supportedQuals, unsupportedQuals) = quals.partition(_.hasSimpleQual) // Only simple quals are supported
+
+    def isSupportedQual(q: Qual): Boolean = {
+      if (!q.hasSimpleQual) {
+        logger.warn("Unsupported qual (not SimpleQual)")
+        return false
+      }
+      val colType = columnTypes(q.getFieldName)
+      val dateColVsTimestampValue = colType.hasDate && q.getSimpleQual.getValue.hasTimestamp
+      if (dateColVsTimestampValue) {
+        // This isn't supported in SOQL
+        logger.warn("Unsupported qual (date column vs timestamp value)")
+        return false
+      }
+      true
+    }
+
+    val (supportedQuals, unsupportedQuals) = quals.partition(isSupportedQual)
     if (supportedQuals.nonEmpty) {
       soql += " WHERE " + supportedQuals
         .map { q =>
-          assert(q.hasSimpleQual, "Only simple quals are supported")
+          val value = q.getSimpleQual.getValue // at this point we know it's a SimpleQual
           val op = q.getSimpleQual.getOperator
           val soqlOp =
             if (op.hasEquals) "="
@@ -222,7 +238,23 @@ abstract class DASSalesforceTable(
               assert(op.hasNotEquals)
               "<>"
             }
-          renameToSalesforce(q.getFieldName) + " " + soqlOp + " " + rawValueToSOQLValue(q.getSimpleQual.getValue)
+          val colType = columnTypes(q.getFieldName)
+          val colName = renameToSalesforce(q.getFieldName)
+          if (colType.hasTimestamp && value.hasDate) {
+            // Turn the date value into a timestamp value (00:00:00)
+            val timestampValue = {
+              val date = value.getDate
+              Value
+                .newBuilder()
+                .setTimestamp(
+                  ValueTimestamp.newBuilder().setYear(date.getYear).setMonth(date.getMonth).setDay(date.getDay)
+                )
+                .build()
+            }
+            renameToSalesforce(q.getFieldName) + " " + soqlOp + " " + rawValueToSOQLValue(timestampValue)
+          } else {
+            colName + " " + soqlOp + " " + rawValueToSOQLValue(value)
+          }
         }
         .mkString(" AND ")
     }
