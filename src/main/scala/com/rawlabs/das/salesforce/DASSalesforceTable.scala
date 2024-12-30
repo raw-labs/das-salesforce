@@ -48,7 +48,7 @@ import scala.collection.mutable
 abstract class DASSalesforceTable(
     connector: DASSalesforceConnector,
     val tableName: String,
-    salesforceObjectName: String
+    val salesforceObjectName: String
 ) extends DASTable
     with StrictLogging {
 
