@@ -188,7 +188,9 @@ abstract class DASSalesforceTable(
       maybeSortKeys: Option[Seq[SortKey]],
       maybeLimit: Option[Long],
       verbose: Boolean
-  ): Seq[String] = Seq.empty
+  ): Seq[String] = {
+    Seq(mkSOQL(quals, columns, maybeSortKeys, maybeLimit))
+  }
 
   override def execute(
       quals: Seq[Qual],
@@ -197,90 +199,15 @@ abstract class DASSalesforceTable(
       maybeLimit: Option[Long]
   ): DASExecuteResult = {
     logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $maybeSortKeys, limit: $maybeLimit")
-    val salesforceColumns = columns.distinct.map(renameToSalesforce)
 
-    var soql = {
-      if (salesforceColumns.isEmpty) {
-        s"SELECT ${renameToSalesforce(tableDefinition.getColumns(0).getName)} FROM " + salesforceObjectName
-      } else {
-        "SELECT " + salesforceColumns.mkString(", ") + " FROM " + salesforceObjectName
-      }
-    }
-
-    def isSupportedQual(q: Qual): Boolean = {
-      if (!q.hasSimpleQual) {
-        logger.warn("Unsupported qual (not SimpleQual)")
-        return false
-      }
-      val colType = columnTypes(q.getFieldName)
-      val dateColVsTimestampValue = colType.hasDate && q.getSimpleQual.getValue.hasTimestamp
-      if (dateColVsTimestampValue) {
-        // This isn't supported in SOQL
-        logger.warn("Unsupported qual (date column vs timestamp value)")
-        return false
-      }
-      true
-    }
-
-    val (supportedQuals, unsupportedQuals) = quals.partition(isSupportedQual)
-    if (supportedQuals.nonEmpty) {
-      soql += " WHERE " + supportedQuals
-        .map { q =>
-          val value = q.getSimpleQual.getValue // at this point we know it's a SimpleQual
-          val op = q.getSimpleQual.getOperator
-          val soqlOp =
-            if (op.hasEquals) "="
-            else if (op.hasGreaterThan) ">"
-            else if (op.hasGreaterThanOrEqual) ">="
-            else if (op.hasLessThan) "<"
-            else if (op.hasLessThanOrEqual) "<="
-            else {
-              assert(op.hasNotEquals)
-              "<>"
-            }
-          val colType = columnTypes(q.getFieldName)
-          val colName = renameToSalesforce(q.getFieldName)
-          if (colType.hasTimestamp && value.hasDate) {
-            // Turn the date value into a timestamp value (00:00:00)
-            val timestampValue = {
-              val date = value.getDate
-              Value
-                .newBuilder()
-                .setTimestamp(
-                  ValueTimestamp.newBuilder().setYear(date.getYear).setMonth(date.getMonth).setDay(date.getDay)
-                )
-                .build()
-            }
-            renameToSalesforce(q.getFieldName) + " " + soqlOp + " " + rawValueToSOQLValue(timestampValue)
-          } else {
-            colName + " " + soqlOp + " " + rawValueToSOQLValue(value)
-          }
-        }
-        .mkString(" AND ")
-    }
-    if (maybeSortKeys.nonEmpty) {
-      soql += " ORDER BY " + maybeSortKeys.get
-        .map { sk =>
-          val order = if (sk.getIsReversed) "DESC" else "ASC"
-          val nulls = if (sk.getNullsFirst) "NULLS FIRST" else "NULLS LAST"
-          renameToSalesforce(sk.getName) + " " + order + " " + nulls
-        }
-        .mkString(", ")
-    }
-    if (unsupportedQuals.isEmpty) {
-      // LIMIT can be pushed _only_ when there are no unsupported quals.
-      if (maybeLimit.nonEmpty) {
-        soql += " LIMIT " + maybeLimit.get
-      }
-    } else {
-      maybeLimit.foreach(_ => logger.warn("Unsupported quals found, ignoring LIMIT"))
-    }
+    val soql = mkSOQL(quals, columns, maybeSortKeys, maybeLimit)
     logger.debug(s"Executing SOQL query: $soql")
     var query = connector.forceApi.query(soql)
 
     new DASExecuteResult {
       private val currentChunk: mutable.Buffer[Row] = mutable.Buffer.empty
       private var currentChunkIndex: Int = 0
+      private val salesforceColumns = columns.map(renameToSalesforce)
 
       readChunk()
 
@@ -351,6 +278,104 @@ abstract class DASSalesforceTable(
   override def delete(rowId: Value): Unit = {
     val id = rowId.getString.getV
     connector.forceApi.deleteSObject(salesforceObjectName, id)
+  }
+
+  private def mkSOQL(
+      quals: Seq[Qual],
+      columns: Seq[String],
+      maybeSortKeys: Option[Seq[SortKey]],
+      maybeLimit: Option[Long]
+  ): String = {
+    val salesforceColumns = columns.distinct.map(renameToSalesforce)
+    var soql = {
+      if (salesforceColumns.isEmpty) {
+        s"SELECT ${renameToSalesforce(tableDefinition.getColumns(0).getName)} FROM " + salesforceObjectName
+      } else {
+        "SELECT " + salesforceColumns.mkString(", ") + " FROM " + salesforceObjectName
+      }
+    }
+
+    val maybePushed = quals.map(qualToSOQL)
+    val supportedQuals = maybePushed.flatten
+    if (supportedQuals.nonEmpty) {
+      soql += " WHERE " + supportedQuals.mkString(" AND ")
+    }
+    if (maybeSortKeys.nonEmpty) {
+      soql += " ORDER BY " + maybeSortKeys.get
+        .map { sk =>
+          val order = if (sk.getIsReversed) "DESC" else "ASC"
+          val nulls = if (sk.getNullsFirst) "NULLS FIRST" else "NULLS LAST"
+          renameToSalesforce(sk.getName) + " " + order + " " + nulls
+        }
+        .mkString(", ")
+    }
+    // If there are no unsupported quals, we can push down the limit
+    if (maybePushed.forall(_.nonEmpty)) {
+      // LIMIT can be pushed _only_ when there are no unsupported quals.
+      if (maybeLimit.nonEmpty) {
+        soql += " LIMIT " + maybeLimit.get
+      }
+    } else {
+      maybeLimit.foreach(_ => logger.warn("Unsupported quals found, ignoring LIMIT"))
+    }
+    soql
+  }
+
+  private def qualToSOQL(q: Qual): Option[String] = {
+    if (q.hasListQual) {
+      val listQual = q.getListQual
+      // Only support IN/NOT IN for now
+      val op = q.getListQual.getOperator
+      if (op.hasEquals && listQual.getIsAny) {
+        // = ANY is equivalent to IN
+        val colName = renameToSalesforce(q.getFieldName)
+        val values = q.getListQual.getValuesList.asScala
+        val soqlValues = values.map(rawValueToSOQLValue)
+        Some(colName + " IN (" + soqlValues.mkString(", ") + ")")
+      } else if (op.hasNotEquals && !listQual.getIsAny) {
+        // <> ALL is equivalent to NOT IN
+        val colName = renameToSalesforce(q.getFieldName)
+        val values = q.getListQual.getValuesList.asScala
+        val soqlValues = values.map(rawValueToSOQLValue)
+        Some(colName + " NOT IN (" + soqlValues.mkString(", ") + ")")
+      } else {
+        logger.warn("Unsupported operator in ListQual")
+        None
+      }
+    } else {
+      val value = q.getSimpleQual.getValue // at this point we know it's a SimpleQual
+      val op = q.getSimpleQual.getOperator
+      val soqlOp =
+        if (op.hasEquals) "="
+        else if (op.hasGreaterThan) ">"
+        else if (op.hasGreaterThanOrEqual) ">="
+        else if (op.hasLessThan) "<"
+        else if (op.hasLessThanOrEqual) "<="
+        else {
+          assert(op.hasNotEquals)
+          "<>"
+        }
+      val colType = columnTypes(q.getFieldName)
+      val colName = renameToSalesforce(q.getFieldName)
+      if (colType.hasDate && value.hasTimestamp) {
+        // This isn't supported by Salesforce
+        None
+      } else if (colType.hasTimestamp && value.hasDate) {
+        // Turn the date value into a timestamp value (00:00:00)
+        val timestampValue = {
+          val date = value.getDate
+          Value
+            .newBuilder()
+            .setTimestamp(
+              ValueTimestamp.newBuilder().setYear(date.getYear).setMonth(date.getMonth).setDay(date.getDay)
+            )
+            .build()
+        }
+        Some(renameToSalesforce(q.getFieldName) + " " + soqlOp + " " + rawValueToSOQLValue(timestampValue))
+      } else {
+        Some(colName + " " + soqlOp + " " + rawValueToSOQLValue(value))
+      }
+    }
   }
 
   private def soqlValueToRawValue(t: Type, v: Any): Value = {
