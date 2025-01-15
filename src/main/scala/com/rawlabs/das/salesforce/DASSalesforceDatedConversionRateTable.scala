@@ -12,8 +12,8 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{DateType, DoubleType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.das.v1.tables.{ColumnDefinition, TableDefinition, TableId}
+import com.rawlabs.protocol.das.v1.types.{DateType, DoubleType, StringType, TimestampType, Type}
 
 class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_dated_conversion_rate", "DatedConversionRate") {
@@ -29,19 +29,19 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("id")
         .setDescription("DatedConversion Rate ID.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("iso_code")
         .setDescription("ISO code of the currency (ISO 4217 standard).")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("start_date")
         .setDescription("The date on which the effective dated exchange rate starts.")
-        .setType(Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -49,48 +49,48 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .setDescription(
           "The date on which the next effective dated exchange rate will start. Effectively the day after the end date for this exchange rate."
         )
-        .setType(Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("conversion_rate")
         .setDescription("Conversion rate of this currency type against the corporate currency.")
-        .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_date")
         .setDescription("Created Date.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_by_id")
         .setDescription("Created By ID.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Last Modified Date.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
         .setDescription("Last Modified By ID.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("System Modstamp.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build()
     )

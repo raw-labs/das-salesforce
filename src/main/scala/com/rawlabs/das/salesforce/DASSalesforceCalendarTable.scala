@@ -12,8 +12,8 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.das.v1.tables.{ColumnDefinition, TableDefinition, TableId}
+import com.rawlabs.protocol.das.v1.types.{BoolType, StringType, TimestampType, Type}
 
 class DASSalesforceCalendarTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_calendar", "Calendar") {
@@ -28,66 +28,66 @@ class DASSalesforceCalendarTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("id")
         .setDescription("Unique identifier for the calendar.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(false)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("name")
         .setDescription("The name of the calendar.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("user_id")
         .setDescription("ID of the user associated with this calendar.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("type")
         .setDescription("Type of the calendar (e.g., Shared, Personal).")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("is_active")
         .setDescription("Indicates whether the calendar is active (true/false).")
-        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_date")
         .setDescription("The date and time when the calendar was created.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_by_id")
         .setDescription("ID of the user who created the calendar.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time when the calendar was last modified.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
         .setDescription("ID of the user who last modified the calendar.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The system modstamp of the calendar.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build()
     )
