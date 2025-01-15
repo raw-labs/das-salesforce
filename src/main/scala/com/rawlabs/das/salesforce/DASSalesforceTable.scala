@@ -12,38 +12,18 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.das.sdk.{DASExecuteResult, DASSdkException, DASTable}
-import com.rawlabs.protocol.das.{ColumnDefinition, Qual, Row, SortKey, TableDefinition}
-import com.rawlabs.protocol.raw.{
-  AttrType,
-  BoolType,
-  DateType,
-  DecimalType,
-  DoubleType,
-  IntType,
-  LongType,
-  RecordType,
-  StringType,
-  TimestampType,
-  Type,
-  Value,
-  ValueBool,
-  ValueDate,
-  ValueDecimal,
-  ValueDouble,
-  ValueInt,
-  ValueNull,
-  ValueRecord,
-  ValueRecordField,
-  ValueString,
-  ValueTimestamp
-}
+import com.rawlabs.das.sdk.scala.DASTable
+import com.rawlabs.das.sdk.scala.DASTable.TableEstimate
+import com.rawlabs.das.sdk.{DASExecuteResult, DASSdkException}
+import com.rawlabs.protocol.das.v1.query.{Operator, PathKey, Qual, SortKey}
+import com.rawlabs.protocol.das.v1.tables.{Column, ColumnDefinition, Row, TableDefinition}
+import com.rawlabs.protocol.das.v1.types._
 import com.typesafe.scalalogging.StrictLogging
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters.{CollectionHasAsScala, MapHasAsJava}
 
 abstract class DASSalesforceTable(
     connector: DASSalesforceConnector,
@@ -93,7 +73,7 @@ abstract class DASSalesforceTable(
       if (c.updatable) markUpdatable(c.columnDefinition.getName)
       if (c.createable) markCreatable(c.columnDefinition.getName)
     }
-    finalColumns
+    finalColumns.toSeq
   }
 
   case class SalesforceColumn(columnDefinition: ColumnDefinition, updatable: Boolean, createable: Boolean)
@@ -102,43 +82,31 @@ abstract class DASSalesforceTable(
     val obj = connector.forceApi.describeSObject(salesforceObjectName)
     obj.getFields.asScala.map { f =>
       val rawType = f.getType match {
-        case "string" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "id" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "reference" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "date" => Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "datetime" =>
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "picklist" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "multipicklist" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "boolean" => Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "textarea" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "combobox" =>
-          Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "currency" =>
-          Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "percent" =>
-          Type.newBuilder().setDecimal(DecimalType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "double" =>
-          Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "int" => Type.newBuilder().setInt(IntType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "long" => Type.newBuilder().setLong(LongType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "string" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "id" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "reference" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "date" => Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build()
+        case "datetime" => Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
+        case "picklist" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "multipicklist" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "boolean" => Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build()
+        case "textarea" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "combobox" => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
+        case "currency" => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
+        case "percent" => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
+        case "double" => Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)).build()
+        case "int" => Type.newBuilder().setInt(IntType.newBuilder().setNullable(true)).build()
+        case "long" => Type.newBuilder().setLong(LongType.newBuilder().setNullable(true)).build()
         case "address" => Type.newBuilder().setRecord(RecordType.newBuilder()).build()
         case "base64" =>
           // Salesforce doesn't support base64 fields in SOQL queries. They are strings, not "binary data".
           // Also the ContentVersion column version_data (base64) is advertised as string.
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "time" =>
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "phone" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "url" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "email" => Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
-        case "encryptedstring" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "time" => Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
+        case "phone" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "url" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "email" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "encryptedstring" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
         case "location" => Type
             .newBuilder()
             .setRecord(
@@ -147,22 +115,21 @@ abstract class DASSalesforceTable(
                 .addAtts(
                   AttrType
                     .newBuilder()
-                    .setIdn("latitude")
-                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)))
+                    .setName("latitude")
+                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)))
                 )
                 .addAtts(
                   AttrType
                     .newBuilder()
-                    .setIdn("longitude")
-                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)))
+                    .setName("longitude")
+                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)))
                 )
             )
             .build()
-        case "anyType" =>
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+        case "anyType" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
         case _ =>
           logger.warn(s"Unhandled Salesforce field type: ${f.getType}, defaulting to StringType.")
-          Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
       }
       val definition = ColumnDefinition
         .newBuilder()
@@ -171,36 +138,28 @@ abstract class DASSalesforceTable(
         .setType(rawType)
         .build()
       SalesforceColumn(definition, updatable = f.isUpdateable, createable = f.isCreateable)
-    }
+    }.toSeq
   }
 
-  override def getRelSize(quals: Seq[Qual], columns: Seq[String]): (Int, Int) = (100, 100)
+  def tableEstimate(quals: Seq[Qual], columns: Seq[String]): TableEstimate = {
+    TableEstimate(100, 100)
+  }
 
   // We push down all sorts to Salesforce, so they are all supported
-  override def canSort(sortKeys: Seq[SortKey]): Seq[SortKey] = sortKeys
+  override def getTableSortOrders(sortKeys: Seq[SortKey]): Seq[SortKey] = sortKeys
 
   // Query by unique ID returns one row
-  override def getPathKeys: Seq[(Seq[String], Int)] = Seq((Seq(uniqueColumn), 1))
+  override def getTablePathKeys: Seq[PathKey] =
+    Seq(PathKey.newBuilder().addKeyColumns(uniqueColumn).setExpectedRows(1).build())
 
-  override def explain(
-      quals: Seq[Qual],
-      columns: Seq[String],
-      maybeSortKeys: Option[Seq[SortKey]],
-      maybeLimit: Option[Long],
-      verbose: Boolean
-  ): Seq[String] = {
-    Seq(mkSOQL(quals, columns, maybeSortKeys, maybeLimit))
+  override def explain(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey]): Seq[String] = {
+    Seq(mkSOQL(quals, columns, sortKeys))
   }
 
-  override def execute(
-      quals: Seq[Qual],
-      columns: Seq[String],
-      maybeSortKeys: Option[Seq[SortKey]],
-      maybeLimit: Option[Long]
-  ): DASExecuteResult = {
-    logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $maybeSortKeys, limit: $maybeLimit")
+  override def execute(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey]): DASExecuteResult = {
+    logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $sortKeys")
 
-    val soql = mkSOQL(quals, columns, maybeSortKeys, maybeLimit)
+    val soql = mkSOQL(quals, columns, sortKeys)
     logger.debug(s"Executing SOQL query: $soql")
     val page = connector.forceApi.query(soql)
 
@@ -235,7 +194,9 @@ abstract class DASSalesforceTable(
               val salesforceValue = record.get(salesforceColumn)
               val columnName = columns(idx)
               val rawType = columnTypes(columnName)
-              row.putData(columnName, soqlValueToRawValue(rawType, salesforceValue))
+              row.addColumns(
+                Column.newBuilder().setName(columnName).setData(soqlValueToRawValue(rawType, salesforceValue))
+              )
           }
           row.build()
         }
@@ -263,21 +224,28 @@ abstract class DASSalesforceTable(
   override def uniqueColumn: String = "id"
 
   override def insert(row: Row): Row = {
-    val newData = row.getDataMap.asScala
-      .filter(kv => creatableFields.contains(kv._1)) // ignore fields that are not creatable
-      .map { case (k, v) => renameToSalesforce(k) -> rawValueToJavaValue(v) }
+    val newData = row.getColumnsList.asScala
+      .filter(kv => creatableFields.contains(kv.getName)) // ignore fields that are not creatable
+      .map(kv => renameToSalesforce(kv.getName) -> rawValueToJavaValue(kv.getData))
       .filter(_._2 != null)
       .toMap
     // Append new "Id" to the row
     val id = connector.forceApi.createSObject(salesforceObjectName, newData.asJava)
-    row.toBuilder.putData("id", Value.newBuilder().setString(ValueString.newBuilder().setV(id).build()).build()).build()
+    row.toBuilder
+      .addColumns(
+        Column
+          .newBuilder()
+          .setName("id")
+          .setData(Value.newBuilder().setString(ValueString.newBuilder().setV(id).build()).build())
+      )
+      .build()
   }
 
   override def update(rowId: Value, newValues: Row): Row = {
     val id = rowId.getString.getV
-    val newData = newValues.getDataMap.asScala
-      .filter(kv => updatableFields.contains(kv._1)) // ignore fields that are not updatable
-      .map { case (k, v) => renameToSalesforce(k) -> rawValueToJavaValue(v) }
+    val newData = newValues.getColumnsList.asScala
+      .filter(kv => updatableFields.contains(kv.getName)) // ignore fields that are not updatable
+      .map(kv => renameToSalesforce(kv.getName) -> rawValueToJavaValue(kv.getData))
       .toMap
     logger.debug(s"Updating row with id $id and new values: $newData")
     connector.forceApi.updateSObject(salesforceObjectName, id, newData.asJava)
@@ -292,8 +260,7 @@ abstract class DASSalesforceTable(
   private def mkSOQL(
       quals: Seq[Qual],
       columns: Seq[String],
-      maybeSortKeys: Option[Seq[SortKey]],
-      maybeLimit: Option[Long]
+      maybeSortKeys: Seq[SortKey]
   ): String = {
     val salesforceColumns = columns.distinct.map(renameToSalesforce)
     var soql = {
@@ -310,7 +277,7 @@ abstract class DASSalesforceTable(
       soql += " WHERE " + supportedQuals.mkString(" AND ")
     }
     if (maybeSortKeys.nonEmpty) {
-      soql += " ORDER BY " + maybeSortKeys.get
+      soql += " ORDER BY " + maybeSortKeys
         .map { sk =>
           val order = if (sk.getIsReversed) "DESC" else "ASC"
           val nulls = if (sk.getNullsFirst) "NULLS FIRST" else "NULLS LAST"
@@ -318,54 +285,48 @@ abstract class DASSalesforceTable(
         }
         .mkString(", ")
     }
-    // If there are no unsupported quals, we can push down the limit
-    if (maybePushed.forall(_.nonEmpty)) {
-      // LIMIT can be pushed _only_ when there are no unsupported quals.
-      if (maybeLimit.nonEmpty) {
-        soql += " LIMIT " + maybeLimit.get
-      }
-    } else {
-      maybeLimit.foreach(_ => logger.warn("Unsupported quals found, ignoring LIMIT"))
-    }
     soql
   }
 
   private def qualToSOQL(q: Qual): Option[String] = {
-    if (q.hasListQual) {
-      val listQual = q.getListQual
-      // Only support IN/NOT IN for now
-      val op = q.getListQual.getOperator
-      if (op.hasEquals && listQual.getIsAny) {
+    if (q.hasIsAnyQual) {
+      if (q.getIsAnyQual.getOperator == Operator.EQUALS) {
         // = ANY is equivalent to IN
-        val colName = renameToSalesforce(q.getFieldName)
-        val values = q.getListQual.getValuesList.asScala
+        val colName = renameToSalesforce(q.getName)
+        val values = q.getIsAnyQual.getValuesList.asScala
         val soqlValues = values.map(rawValueToSOQLValue)
         Some(colName + " IN (" + soqlValues.mkString(", ") + ")")
-      } else if (op.hasNotEquals && !listQual.getIsAny) {
+      } else {
+        logger.warn("Unsupported operator in IsAny")
+        None
+      }
+    } else if (q.hasIsAllQual) {
+      if (q.getIsAllQual.getOperator == Operator.NOT_EQUALS) {
         // <> ALL is equivalent to NOT IN
-        val colName = renameToSalesforce(q.getFieldName)
-        val values = q.getListQual.getValuesList.asScala
+        val colName = renameToSalesforce(q.getName)
+        val values = q.getIsAllQual.getValuesList.asScala
         val soqlValues = values.map(rawValueToSOQLValue)
         Some(colName + " NOT IN (" + soqlValues.mkString(", ") + ")")
       } else {
-        logger.warn("Unsupported operator in ListQual")
+        logger.warn("Unsupported operator in IsAll")
         None
       }
     } else {
       val value = q.getSimpleQual.getValue // at this point we know it's a SimpleQual
       val op = q.getSimpleQual.getOperator
-      val soqlOp =
-        if (op.hasEquals) "="
-        else if (op.hasGreaterThan) ">"
-        else if (op.hasGreaterThanOrEqual) ">="
-        else if (op.hasLessThan) "<"
-        else if (op.hasLessThanOrEqual) "<="
-        else {
-          assert(op.hasNotEquals)
-          "<>"
-        }
-      val colType = columnTypes(q.getFieldName)
-      val colName = renameToSalesforce(q.getFieldName)
+      val soqlOp = op match {
+        case Operator.EQUALS => "="
+        case Operator.GREATER_THAN => ">"
+        case Operator.GREATER_THAN_OR_EQUAL => ">="
+        case Operator.LESS_THAN => "<"
+        case Operator.LESS_THAN_OR_EQUAL => "<="
+        case Operator.NOT_EQUALS => "<>"
+        case _ =>
+          logger.warn(s"Unsupported operator: $op")
+          return None
+      }
+      val colType = columnTypes(q.getName)
+      val colName = renameToSalesforce(q.getName)
       if (colType.hasDate && value.hasTimestamp) {
         // This isn't supported by Salesforce
         None
@@ -380,7 +341,7 @@ abstract class DASSalesforceTable(
             )
             .build()
         }
-        Some(renameToSalesforce(q.getFieldName) + " " + soqlOp + " " + rawValueToSOQLValue(timestampValue))
+        Some(renameToSalesforce(q.getName) + " " + soqlOp + " " + rawValueToSOQLValue(timestampValue))
       } else {
         Some(colName + " " + soqlOp + " " + rawValueToSOQLValue(value))
       }
@@ -454,14 +415,14 @@ abstract class DASSalesforceTable(
         logger.info(v.toString)
         val record = v.asInstanceOf[Map[String, Any]]
         val recordValue = ValueRecord.newBuilder()
-        val typeMap = t.getRecord.getAttsList.asScala.map(att => att.getIdn -> att.getTipe).toMap
+        val typeMap = t.getRecord.getAttsList.asScala.map(att => att.getName -> att.getTipe).toMap
         record.foreach {
           case (k, v) =>
             val fieldValue = typeMap.get(k) match {
               case Some(fieldType) => soqlValueToRawValue(fieldType, v)
               case None => anySoqlValueToRawValue(v)
             }
-            recordValue.addFields(ValueRecordField.newBuilder().setName(k).setValue(fieldValue).build())
+            recordValue.addAtts(ValueRecordAttr.newBuilder().setName(k).setValue(fieldValue).build())
         }
         Value.newBuilder().setRecord(recordValue.build()).build()
       } else if (t.hasAny) anySoqlValueToRawValue(v)
@@ -482,8 +443,8 @@ abstract class DASSalesforceTable(
       case m: Map[_, _] =>
         val record = ValueRecord.newBuilder()
         m.foreach {
-          case (k: String, v) =>
-            record.addFields(ValueRecordField.newBuilder().setName(k).setValue(anySoqlValueToRawValue(v)).build())
+          case (k, v) =>
+            record.addAtts(ValueRecordAttr.newBuilder().setName(k.toString).setValue(anySoqlValueToRawValue(v)).build())
         }
         Value.newBuilder().setRecord(record.build()).build()
       case t =>

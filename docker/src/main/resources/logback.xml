@@ -14,6 +14,7 @@
 
     <logger name="com.rawlabs" level="TRACE"/>
     <logger name="io.grpc" level="INFO"/>
+    <logger name="net.openhft.chronicle" level="INFO"/>
     <logger name="org.apache.http" level="INFO"/>
     <logger name="io.netty" level="ERROR"/>
 </configuration>
