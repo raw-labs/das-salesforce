@@ -12,8 +12,8 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.das.v1.tables.{ColumnDefinition, TableDefinition, TableId}
+import com.rawlabs.protocol.das.v1.types.{BoolType, StringType, TimestampType, Type}
 
 class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_opportunity_contact_role", "OpportunityContactRole") {
@@ -30,13 +30,13 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .newBuilder()
         .setName("id")
         .setDescription("Unique identifier of the opportunity contact role in Salesforce.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("contact_id")
         .setDescription("ID of an associated Contact.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -44,13 +44,13 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .setDescription(
           "Indicates whether the associated Contact plays the primary role on the Opportunity (true) or not (false)."
         )
-        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("opportunity_id")
         .setDescription("Required. ID of an associated Opportunity.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -58,34 +58,34 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .setDescription(
           "Name of the role played by the associated Contact on the Opportunity, such as Business User or Decision Maker."
         )
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_by_id")
         .setDescription("Id of the user who created contact role record.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_date")
         .setDescription("Date and time of the creation of the contact role record.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
         .setDescription("Id of the user who most recently changed the contact role record.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Date of most recent change in the contact role record.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build()
     )

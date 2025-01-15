@@ -12,8 +12,8 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, DoubleType, IntType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.das.v1.tables.{ColumnDefinition, TableDefinition, TableId}
+import com.rawlabs.protocol.das.v1.types._
 
 class DASSalesforceAsset(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_asset", "Asset") {
@@ -30,19 +30,19 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("id")
         .setDescription("Unique identifier of the product in asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("name")
         .setDescription("Name of the asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("account_id")
         .setDescription("ID of the Account associated with this asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -50,52 +50,52 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setDescription(
           "The asset's position in an asset hierarchy. If the asset has no parent or child assets, its level is 1."
         )
-        .setType(Type.newBuilder().setInt(IntType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setInt(IntType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("contact_id")
         .setDescription("ID of the Contact associated with this asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("asset_provided_by_id")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .setDescription("The account that provided the asset, typically a manufacturer.")
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("asset_serviced_by_id")
         .setDescription("The account in charge of servicing the asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_by_id")
         .setDescription("The id of the user who created the asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_date")
         .setDescription("Date and time of the creation of the price book record.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("description")
         .setDescription("Description of the asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("install_date")
         .setDescription("Date when the asset was installed.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -104,13 +104,13 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setDescription(
           "Indicates whether this Asset represents a product sold by a competitor (true) or not (false)."
         )
-        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("is_deleted")
         .setDescription("The Deleted.")
-        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -118,20 +118,20 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setDescription(
           "Indicates that the asset is produced or used internally (true) or not (false). Default value is false."
         )
-        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
         .setDescription("The Last Modified By ID.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The Last Modified Date.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -139,7 +139,7 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setName("last_referenced_date")
         .setDescription("The date and time that the asset was last modified.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -147,7 +147,7 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setName("last_viewed_date")
         .setDescription("The date and time that the asset was last viewed.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -156,45 +156,45 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setDescription(
           "The asset's owner. By default, the asset owner is the user who created the asset record."
         )
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("parent_id")
         .setDescription("The asset's parent asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("price")
         .setDescription("Price paid for this asset.")
-        .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("product_2_id")
         .setDescription("ID of the Product2 associated with this asset. Must be a valid Product2 ID.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("product_code")
         .setDescription("The product code of the related product.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("purchase_date")
         .setDescription("Date on which this asset was purchased.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("quantity")
         .setDescription("Quantity purchased or installed.")
-        .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -202,13 +202,13 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setDescription(
           "The top-level asset in an asset hierarchy. Depending on where an asset lies in the hierarchy, its root could be the same as its parent."
         )
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("serial_number")
         .setDescription("Serial number for this asset.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -216,20 +216,20 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setDescription(
           "Customizable picklist of values. The default picklist includes the following values: Purchased, Shipped, Installed, Registered, Obsolete."
         )
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("stock_keeping_unit")
         .setDescription("The SKU assigned to the related product.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The System Modstamp.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
@@ -237,7 +237,7 @@ class DASSalesforceAsset(connector: DASSalesforceConnector)
         .setName("usage_end_date")
         .setDescription("Date when usage for this asset ends or expires.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
         )
         .build()
     )

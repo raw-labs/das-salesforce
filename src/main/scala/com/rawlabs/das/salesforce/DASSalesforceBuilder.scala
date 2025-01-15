@@ -12,13 +12,13 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.das.sdk.{DASSdk, DASSdkBuilder}
-import com.rawlabs.utils.core.RawSettings
+import com.rawlabs.das.sdk.DASSettings
+import com.rawlabs.das.sdk.scala.{DASSdk, DASSdkBuilder}
 
 class DASSalesforceBuilder extends DASSdkBuilder {
 
   override def dasType: String = "salesforce"
 
-  override def build(options: Map[String, String])(implicit settings: RawSettings): DASSdk = new DASSalesforce(options)
+  override def build(options: Map[String, String])(implicit settings: DASSettings): DASSdk = new DASSalesforce(options)
 
 }
