@@ -13,8 +13,9 @@
 package com.rawlabs.das.salesforce
 
 import com.force.api.ApiException
-import com.rawlabs.das.sdk._
-import com.rawlabs.protocol.das._
+import com.rawlabs.das.sdk.scala.{DASFunction, DASSdk, DASTable}
+import com.rawlabs.protocol.das.v1.functions.FunctionDefinition
+import com.rawlabs.protocol.das.v1.tables.TableDefinition
 import com.typesafe.scalalogging.StrictLogging
 
 class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogging {
