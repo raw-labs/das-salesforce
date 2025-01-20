@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
+import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.Universal
 import sbt.*
 import sbt.Keys.*
 
@@ -126,13 +127,13 @@ lazy val root = (project in file("."))
     )
   )
 
-val amzn_jdk_version = "21.0.4.7-1"
-val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb"
-val amzn_corretto_bin_dl_url = s"https://corretto.aws/downloads/resources/${amzn_jdk_version.replace('-', '.')}"
+//val amzn_jdk_version = "21.0.4.7-1"
+//val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb"
+//val amzn_corretto_bin_dl_url = s"https://corretto.aws/downloads/resources/${amzn_jdk_version.replace('-', '.')}"
 
 lazy val dockerSettings = strictBuildSettings ++ Seq(
   name := "das-salesforce-server",
-  dockerBaseImage := s"--platform=amd64 debian:bookworm-slim",
+  dockerBaseImage := s"--platform=amd64 ghcr.io/graalvm/jdk-community:22",
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-salesforce-server",
@@ -150,18 +151,6 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     case cmd => false
   },
   dockerCommands ++= Seq(
-    Cmd(
-      "RUN",
-      s"""set -eux \\
-      && apt-get update \\
-      && apt-get install -y --no-install-recommends \\
-        curl wget ca-certificates gnupg software-properties-common fontconfig java-common \\
-      && wget $amzn_corretto_bin_dl_url/$amzn_corretto_bin \\
-      && dpkg --install $amzn_corretto_bin \\
-      && rm -f $amzn_corretto_bin \\
-      && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \\
-          wget gnupg software-properties-common"""
-    ),
     Cmd(
       "USER",
       "raw"
@@ -214,7 +203,10 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       )
       case None => Seq(baseAlias)
     }
-  }
+  },
+  Universal / javaOptions ++= chronicleFlags.map("-J" + _)
+
+
 )
 
 lazy val docker = (project in file("docker"))
