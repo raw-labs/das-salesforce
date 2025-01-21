@@ -13,7 +13,7 @@
 package com.rawlabs.das.salesforce
 
 import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, DoubleType, IntType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.raw.{BoolType, DateType, DoubleType, IntType, StringType, TimestampType, Type}
 
 class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_opportunity", "Opportunity") {
@@ -71,7 +71,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .setName("close_date")
         .setDescription("Date when the opportunity is expected to close.")
         .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
+          Type.newBuilder().setDate(DateType.newBuilder().setTriable(false).setNullable(true)).build()
         )
         .build(),
       ColumnDefinition
