@@ -206,29 +206,29 @@ abstract class DASSalesforceTable(
 
     val pageIterator = new Iterator[Seq[Row]] {
 
-      private var currentBatch = page.getRecords.asScala // We start with the first batch
+      private var currentBatch = Option(page.getRecords.asScala) // We start with the first batch
       private var nextUrl = Option(page.getNextRecordsUrl) // If there's a next URL, there are more rows
 
       private val salesforceColumns = columns.map(renameToSalesforce)
 
       override def hasNext: Boolean = {
         // currentBatch is set to null when a page was consumed.
-        if (currentBatch == null) {
+        if (currentBatch.isEmpty) {
           // 'next' did consume the last batch. If there's a next URL, there are more rows,
           // fetch the next batch.
           nextUrl.foreach { url =>
             val nextPage = connector.forceApi.queryMore(url)
-            currentBatch = nextPage.getRecords.asScala
+            currentBatch = Option(nextPage.getRecords.asScala)
             nextUrl = Option(nextPage.getNextRecordsUrl)
           }
         }
         // If currentBatch is still null, there are no more rows.
-        currentBatch != null
+        currentBatch.nonEmpty
       }
 
       override def next(): Seq[Row] = {
         assert(hasNext)
-        val rows = currentBatch.map { record =>
+        val rows = currentBatch.get.map { record =>
           val row = Row.newBuilder()
           salesforceColumns.zipWithIndex.foreach {
             case (salesforceColumn, idx) =>
@@ -239,7 +239,7 @@ abstract class DASSalesforceTable(
           }
           row.build()
         }
-        currentBatch = null
+        currentBatch = None
         rows
       }
     }
