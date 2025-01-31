@@ -202,19 +202,33 @@ abstract class DASSalesforceTable(
 
     val soql = mkSOQL(quals, columns, maybeSortKeys, maybeLimit)
     logger.debug(s"Executing SOQL query: $soql")
-    var query = connector.forceApi.query(soql)
+    val page = connector.forceApi.query(soql)
 
-    new DASExecuteResult {
-      private val currentChunk: mutable.Buffer[Row] = mutable.Buffer.empty
-      private var currentChunkIndex: Int = 0
+    val pageIterator = new Iterator[Seq[Row]] {
+
+      private var currentBatch = Option(page.getRecords.asScala) // We start with the first batch
+      private var nextUrl = Option(page.getNextRecordsUrl) // If there's a next URL, there are more rows
+
       private val salesforceColumns = columns.map(renameToSalesforce)
 
-      readChunk()
+      override def hasNext: Boolean = {
+        // currentBatch is set to null when a page was consumed.
+        if (currentBatch.isEmpty) {
+          // 'next' did consume the last batch. If there's a next URL, there are more rows,
+          // fetch the next batch.
+          nextUrl.foreach { url =>
+            val nextPage = connector.forceApi.queryMore(url)
+            currentBatch = Option(nextPage.getRecords.asScala)
+            nextUrl = Option(nextPage.getNextRecordsUrl)
+          }
+        }
+        // If currentBatch is still null, there are no more rows.
+        currentBatch.nonEmpty
+      }
 
-      private def readChunk(): Unit = {
-        currentChunk.clear()
-        currentChunkIndex = 0
-        query.getRecords.asScala.foreach { record =>
+      override def next(): Seq[Row] = {
+        assert(hasNext)
+        val rows = currentBatch.get.map { record =>
           val row = Row.newBuilder()
           salesforceColumns.zipWithIndex.foreach {
             case (salesforceColumn, idx) =>
@@ -223,32 +237,27 @@ abstract class DASSalesforceTable(
               val rawType = columnTypes(columnName)
               row.putData(columnName, soqlValueToRawValue(rawType, salesforceValue))
           }
-          currentChunk += row.build()
+          row.build()
         }
-
-        if (!query.isDone) {
-          query = connector.forceApi.queryMore(query.getNextRecordsUrl)
-        }
+        currentBatch = None
+        rows
       }
+    }
+
+    new DASExecuteResult {
+
+      private val rows = pageIterator.flatten
 
       override def close(): Unit = {}
 
-      override def hasNext: Boolean = {
-        currentChunkIndex < currentChunk.size || !query.isDone
-      }
+      override def hasNext: Boolean = rows.nonEmpty
 
       override def next(): Row = {
         if (!hasNext) throw new NoSuchElementException("No more elements")
-
-        if (currentChunkIndex == currentChunk.size) {
-          readChunk()
-        }
-
-        val row = currentChunk(currentChunkIndex)
-        currentChunkIndex += 1
-        row
+        rows.next()
       }
     }
+
   }
 
   override def uniqueColumn: String = "id"
