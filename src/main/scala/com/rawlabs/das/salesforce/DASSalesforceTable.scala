@@ -152,14 +152,14 @@ abstract class DASSalesforceTable(
   override def getTablePathKeys: Seq[PathKey] =
     Seq(PathKey.newBuilder().addKeyColumns(uniqueColumn).setExpectedRows(1).build())
 
-  override def explain(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey]): Seq[String] = {
-    Seq(mkSOQL(quals, columns, sortKeys))
+  override def explain(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey], maybeLimit: Option[Long]): Seq[String] = {
+    mkSOQL(quals, columns, sortKeys, maybeLimit).split("\n").toSeq
   }
 
-  override def execute(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey]): DASExecuteResult = {
+  override def execute(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey], maybeLimit: Option[Long]): DASExecuteResult = {
     logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $sortKeys")
 
-    val soql = mkSOQL(quals, columns, sortKeys)
+    val soql = mkSOQL(quals, columns, sortKeys, maybeLimit)
     logger.debug(s"Executing SOQL query: $soql")
     val page = connector.forceApi.query(soql)
 
@@ -201,7 +201,7 @@ abstract class DASSalesforceTable(
           row.build()
         }
         currentBatch = None
-        rows
+        rows.toSeq
       }
     }
 
@@ -260,7 +260,8 @@ abstract class DASSalesforceTable(
   private def mkSOQL(
       quals: Seq[Qual],
       columns: Seq[String],
-      maybeSortKeys: Seq[SortKey]
+      maybeSortKeys: Seq[SortKey],
+      maybeLimit: Option[Long]
   ): String = {
     val salesforceColumns = columns.distinct.map(renameToSalesforce)
     var soql = {
@@ -272,6 +273,7 @@ abstract class DASSalesforceTable(
     }
 
     val maybePushed = quals.map(qualToSOQL)
+    val skippedPredicates = maybePushed.exists(_.isEmpty)
     val supportedQuals = maybePushed.flatten
     if (supportedQuals.nonEmpty) {
       soql += " WHERE " + supportedQuals.mkString(" AND ")
@@ -284,6 +286,9 @@ abstract class DASSalesforceTable(
           renameToSalesforce(sk.getName) + " " + order + " " + nulls
         }
         .mkString(", ")
+    }
+    if (maybeLimit.isDefined && !skippedPredicates) {
+      soql += " LIMIT " + maybeLimit.get
     }
     soql
   }

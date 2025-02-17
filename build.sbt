@@ -24,7 +24,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val buildSettings = Seq(
-  scalaVersion := "2.13.16",
+  scalaVersion := "2.13.15",
   javacOptions ++= Seq(
     "-source",
     "21",
@@ -117,8 +117,8 @@ lazy val root = (project in file("."))
     strictBuildSettings,
     publishSettings,
     libraryDependencies ++= Seq(
-      "com.raw-labs" %% "das-server-scala" % "0.1.7-protocol-v1-add-limit-SNAPSHOT" % "compile->compile;test->test",
-      "com.raw-labs" %% "protocol-das" % "protocol-v1-ben-beta-protocol-v1-delete-cache-SNAPSHOT" % "compile->compile;test->test",
+      "com.raw-labs" %% "das-server-scala" % "1.0.0-beta5" % "compile->compile;test->test",
+      "com.raw-labs" %% "protocol-das" % "1.0.0-beta3" % "compile->compile;test->test",
       "com.frejo" % "force-rest-api" % "0.0.45",
       "joda-time" % "joda-time" % "2.12.7",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.15.2",
@@ -231,5 +231,5 @@ lazy val docker = (project in file("docker"))
   .settings(
     strictBuildSettings,
     dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.1.7-protocol-v1-add-limit-SNAPSHOT" % "compile->compile;test->test",
+    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "1.0.0-beta5" % "compile->compile;test->test",
   )
