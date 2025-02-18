@@ -1,6 +1,6 @@
 import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
-import sbt.Keys._
-import sbt._
+import sbt.*
+import sbt.Keys.*
 
 import java.nio.file.Paths
 
@@ -23,7 +23,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val buildSettings = Seq(
-  scalaVersion := "2.12.18",
+  scalaVersion := "2.13.15",
   javacOptions ++= Seq(
     "-source",
     "21",
@@ -33,10 +33,6 @@ lazy val buildSettings = Seq(
   scalacOptions ++= Seq(
     "-feature",
     "-unchecked",
-    // When compiling in encrypted drives in Linux, the max size of a name is reduced to around 140
-    // https://unix.stackexchange.com/a/32834
-    "-Xmax-classfile-name",
-    "140",
     "-deprecation",
     "-Xlint:-stars-align,_",
     "-Ywarn-dead-code",
@@ -65,7 +61,7 @@ lazy val testSettings = Seq(
   //Test / parallelExecution := false,
   // Pass system properties starting with "raw." to the forked JVMs.
   Test / javaOptions ++= {
-    import scala.collection.JavaConverters._
+    import scala.collection.JavaConverters.*
     val props = System.getProperties
     props
       .stringPropertyNames()
@@ -104,7 +100,8 @@ lazy val root = (project in file("."))
     strictBuildSettings,
     publishSettings,
     libraryDependencies ++= Seq(
-      "com.raw-labs" %% "das-sdk-scala" % "0.1.4" % "compile->compile;test->test",
+      "com.raw-labs" %% "das-server-scala" % "0.3.0" % "compile->compile;test->test",
+      "com.raw-labs" %% "protocol-das" % "1.0.0" % "compile->compile;test->test",
       "com.frejo" % "force-rest-api" % "0.0.45",
       "joda-time" % "joda-time" % "2.12.7",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.15.2",
@@ -134,7 +131,7 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
   // We remove the automatic switch to USER 1001:0.
   // We we want to run as root to install the JDK, also later we will switch to a non-root user.
   dockerCommands := dockerCommands.value.filterNot {
-    case Cmd("USER", args @ _*) => args.contains("1001:0")
+    case Cmd("USER", args@_*) => args.contains("1001:0")
     case cmd => false
   },
   dockerCommands ++= Seq(
@@ -166,13 +163,13 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     val ClasspathPattern = "declare -r app_classpath=\"(.*)\"\n".r
     bashScriptDefines.value.map {
       case ClasspathPattern(classpath) => s"""
-        |declare -r app_classpath="$${app_home}/../conf:$classpath"
-        |""".stripMargin
-      case _ @entry => entry
+                                             |declare -r app_classpath="$${app_home}/../conf:$classpath"
+                                             |""".stripMargin
+      case _@entry => entry
     }
   },
   Docker / dockerLayerMappings := (Docker / dockerLayerMappings).value.map {
-    case lm @ LayeredMapping(Some(1), file, path) => {
+    case lm@LayeredMapping(Some(1), file, path) => {
       val fileName = java.nio.file.Paths.get(path).getFileName.toString
       if (!fileName.endsWith(".jar")) {
         // If it is not a jar, put it on the top layer. Configuration files and other small files.
@@ -185,9 +182,9 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
         lm
       }
     }
-    case lm @ _ => lm
+    case lm@_ => lm
   },
-  Compile / mainClass := Some("com.rawlabs.das.server.DASServerMain"),
+  Compile / mainClass := Some("com.rawlabs.das.server.DASServer"),
   Docker / dockerAutoremoveMultiStageIntermediateImages := false,
   dockerAlias := dockerAlias.value.withTag(Option(version.value.replace("+", "-"))),
   dockerAliases := {
@@ -197,9 +194,9 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
 
     releaseRegistry match {
       case Some(releaseReg) => Seq(
-          baseAlias,
-          dockerAlias.value.withRegistryHost(Some(releaseReg))
-        )
+        baseAlias,
+        dockerAlias.value.withRegistryHost(Some(releaseReg))
+      )
       case None => Seq(baseAlias)
     }
   }
@@ -213,5 +210,5 @@ lazy val docker = (project in file("docker"))
   .settings(
     strictBuildSettings,
     dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.2.0" % "compile->compile;test->test"
+    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.3.0" % "compile->compile;test->test"
   )

@@ -12,14 +12,13 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.protocol.das.{TableDefinition, TableId}
+import com.rawlabs.protocol.das.v1.tables.{TableDefinition, TableId}
 
 class DASSalesforceDynamicTable(connector: DASSalesforceConnector, objectName: String)
     extends DASSalesforceTable(
       connector,
       s"salesforce_${DASSalesforceUtils.renameFromSalesforce(objectName)}",
-      objectName
-    ) {
+      objectName) {
 
   override def tableDefinition: TableDefinition = {
     val tbl = TableDefinition

@@ -12,8 +12,8 @@
 
 package com.rawlabs.das.salesforce
 
-import com.rawlabs.protocol.das.{ColumnDefinition, TableDefinition, TableId}
-import com.rawlabs.protocol.raw.{BoolType, IntType, RecordType, StringType, TimestampType, Type}
+import com.rawlabs.protocol.das.v1.tables.{ColumnDefinition, TableDefinition, TableId}
+import com.rawlabs.protocol.das.v1.types._
 
 class DASSalesforceContractTable(connector: DASSalesforceConnector)
     extends DASSalesforceTable(connector, "salesforce_contract", "Contract") {
@@ -22,79 +22,69 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a contract (a business agreement) associated with an Account."
-      )
+      .setDescription("Represents a contract (a business agreement) associated with an Account.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
         .setName("id")
         .setDescription("Unique identifier of the contract in Salesforce.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("account_id")
         .setDescription("ID of the Account associated with this contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("contract_number")
         .setDescription("Number of the contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("contract_term")
         .setDescription("Number of months that the contract is valid.")
-        .setType(Type.newBuilder().setInt(IntType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setInt(IntType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("end_date")
         .setDescription(
-          "Calculated end date of the contract. This value is calculated by adding the ContractTerm to the start_date."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+          "Calculated end date of the contract. This value is calculated by adding the ContractTerm to the start_date.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("owner_id")
         .setDescription("ID of the user who owns the contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("start_date")
         .setDescription("Start date for this contract.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("status")
         .setDescription(
-          "The picklist of values that indicate order status. A contract can be Draft, InApproval, or Activated."
-        )
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+          "The picklist of values that indicate order status. A contract can be Draft, InApproval, or Activated.")
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("activated_by_id")
         .setDescription("ID of the User who activated this contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("activated_date")
         .setDescription("Date and time when this contract was activated.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -106,143 +96,120 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("company_signed_date")
         .setDescription("Date on which the contract was signed by organization.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("company_signed_id")
         .setDescription("ID of the User who signed the contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_by_id")
         .setDescription("Id of the user who created the contract record.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("created_date")
         .setDescription("Date and time when contract record was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("customer_signed_date")
         .setDescription("Date on which the customer signed the contract.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("customer_signed_id")
         .setDescription("ID of the Contact who signed this contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("customer_signed_title")
         .setDescription("Title of the contact who signed the contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("description")
         .setDescription("Statement describing the contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("is_deleted")
         .setDescription("Indicates whether the object has been moved to the Recycle Bin (true) or not (false).")
-        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_activity_date")
         .setDescription(
-          "Value is one of the following, whichever is the most recent. a) Due date of the most recent event logged against the record. b) Due date of the most recently closed task associated with the record."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+          "Value is one of the following, whichever is the most recent. a) Due date of the most recent event logged against the record. b) Due date of the most recently closed task associated with the record.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_approved_date")
         .setDescription("Last date the contract was approved.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
         .setDescription("The id of user who most recently changed the contract record.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time of the last change to contract record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription(
-          "The timestamp when the current user last accessed this record, a record related to this record, or a list view."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+          "The timestamp when the current user last accessed this record, a record related to this record, or a list view.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription(
-          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (last_referenced_date) but not viewed it."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
+          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (last_referenced_date) but not viewed it.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("owner_expiration_notice")
         .setDescription(
-          "Number of days ahead of the contract end date (15, 30, 45, 60, 90, and 120). Used to notify the owner in advance that the contract is ending."
-        )
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+          "Number of days ahead of the contract end date (15, 30, 45, 60, 90, and 120). Used to notify the owner in advance that the contract is ending.")
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("pricebook_2_id")
         .setDescription("ID of the pricebook, if any, associated with this contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("special_terms")
         .setDescription("Special terms that apply to the contract.")
-        .setType(Type.newBuilder().setString(StringType.newBuilder().setTriable(false).setNullable(true)).build())
+        .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The date and time when contract was last modified by a user or by an automated process.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setTriable(false).setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()
