@@ -22,9 +22,7 @@ class DASSalesforceAccountContactRoleTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents the role that a Contact plays on an Account."
-      )
+      .setDescription("Represents the role that a Contact plays on an Account.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -48,16 +46,14 @@ class DASSalesforceAccountContactRoleTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("is_primary")
         .setDescription(
-          "Specifies whether the Contact plays the primary role on the Account (true) or not (false). Note that each account has only one primary contact role."
-        )
+          "Specifies whether the Contact plays the primary role on the Account (true) or not (false). Note that each account has only one primary contact role.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("role")
         .setDescription(
-          "Name of the role played by the Contact on this Account, such as Decision Maker, Approver, Buyer, and so on."
-        )
+          "Name of the role played by the Contact on this Account, such as Decision Maker, Approver, Buyer, and so on.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -70,27 +66,20 @@ class DASSalesforceAccountContactRoleTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The creation date and time of the account contact role.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
-        .setDescription(
-          "Id of the user who most recently changed the contact role record."
-        )
+        .setDescription("Id of the user who most recently changed the contact role record.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Date of most recent change in the contact role record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

@@ -12,6 +12,12 @@
 
 package com.rawlabs.das.salesforce
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+import scala.collection.mutable
+import scala.jdk.CollectionConverters.{CollectionHasAsScala, MapHasAsJava}
+
 import com.rawlabs.das.sdk.scala.DASTable
 import com.rawlabs.das.sdk.scala.DASTable.TableEstimate
 import com.rawlabs.das.sdk.{DASExecuteResult, DASSdkException}
@@ -20,24 +26,18 @@ import com.rawlabs.protocol.das.v1.tables.{Column, ColumnDefinition, Row, TableD
 import com.rawlabs.protocol.das.v1.types._
 import com.typesafe.scalalogging.StrictLogging
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import scala.collection.mutable
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, MapHasAsJava}
-
 abstract class DASSalesforceTable(
     connector: DASSalesforceConnector,
     val tableName: String,
-    salesforceObjectName: String
-) extends DASTable
+    salesforceObjectName: String)
+    extends DASTable
     with StrictLogging {
 
   import DASSalesforceUtils._
 
   assert(
     salesforceObjectName.capitalize == salesforceObjectName,
-    "Salesforce object name must be capitalized as per Salesforce API"
-  )
+    "Salesforce object name must be capitalized as per Salesforce API")
 
   def tableDefinition: TableDefinition
 
@@ -82,32 +82,33 @@ abstract class DASSalesforceTable(
     val obj = connector.forceApi.describeSObject(salesforceObjectName)
     obj.getFields.asScala.map { f =>
       val rawType = f.getType match {
-        case "string" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "id" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "reference" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "date" => Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build()
-        case "datetime" => Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        case "picklist" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "string"        => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "id"            => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "reference"     => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "date"          => Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build()
+        case "datetime"      => Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
+        case "picklist"      => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
         case "multipicklist" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "boolean" => Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build()
-        case "textarea" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "combobox" => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
-        case "currency" => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
-        case "percent" => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
-        case "double" => Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)).build()
-        case "int" => Type.newBuilder().setInt(IntType.newBuilder().setNullable(true)).build()
-        case "long" => Type.newBuilder().setLong(LongType.newBuilder().setNullable(true)).build()
-        case "address" => Type.newBuilder().setRecord(RecordType.newBuilder()).build()
-        case "base64" =>
+        case "boolean"       => Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build()
+        case "textarea"      => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "combobox"      => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
+        case "currency"      => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
+        case "percent"       => Type.newBuilder().setDecimal(DecimalType.newBuilder().setNullable(true)).build()
+        case "double"        => Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)).build()
+        case "int"           => Type.newBuilder().setInt(IntType.newBuilder().setNullable(true)).build()
+        case "long"          => Type.newBuilder().setLong(LongType.newBuilder().setNullable(true)).build()
+        case "address"       => Type.newBuilder().setRecord(RecordType.newBuilder()).build()
+        case "base64"        =>
           // Salesforce doesn't support base64 fields in SOQL queries. They are strings, not "binary data".
           // Also the ContentVersion column version_data (base64) is advertised as string.
           Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "time" => Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        case "phone" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "url" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "email" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "time"            => Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
+        case "phone"           => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "url"             => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
+        case "email"           => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
         case "encryptedstring" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
-        case "location" => Type
+        case "location" =>
+          Type
             .newBuilder()
             .setRecord(
               RecordType
@@ -116,15 +117,11 @@ abstract class DASSalesforceTable(
                   AttrType
                     .newBuilder()
                     .setName("latitude")
-                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)))
-                )
-                .addAtts(
-                  AttrType
-                    .newBuilder()
-                    .setName("longitude")
-                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)))
-                )
-            )
+                    .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true))))
+                .addAtts(AttrType
+                  .newBuilder()
+                  .setName("longitude")
+                  .setTipe(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)))))
             .build()
         case "anyType" => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
         case _ =>
@@ -156,8 +153,7 @@ abstract class DASSalesforceTable(
       quals: Seq[Qual],
       columns: Seq[String],
       sortKeys: Seq[SortKey],
-      maybeLimit: Option[Long]
-  ): Seq[String] = {
+      maybeLimit: Option[Long]): Seq[String] = {
     mkSOQL(quals, columns, sortKeys, maybeLimit).split("\n").toSeq
   }
 
@@ -165,8 +161,7 @@ abstract class DASSalesforceTable(
       quals: Seq[Qual],
       columns: Seq[String],
       sortKeys: Seq[SortKey],
-      maybeLimit: Option[Long]
-  ): DASExecuteResult = {
+      maybeLimit: Option[Long]): DASExecuteResult = {
     logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $sortKeys")
 
     val soql = mkSOQL(quals, columns, sortKeys, maybeLimit)
@@ -199,14 +194,12 @@ abstract class DASSalesforceTable(
         assert(hasNext)
         val rows = currentBatch.get.map { record =>
           val row = Row.newBuilder()
-          salesforceColumns.zipWithIndex.foreach {
-            case (salesforceColumn, idx) =>
-              val salesforceValue = record.get(salesforceColumn)
-              val columnName = columns(idx)
-              val rawType = columnTypes(columnName)
-              row.addColumns(
-                Column.newBuilder().setName(columnName).setData(soqlValueToRawValue(rawType, salesforceValue))
-              )
+          salesforceColumns.zipWithIndex.foreach { case (salesforceColumn, idx) =>
+            val salesforceValue = record.get(salesforceColumn)
+            val columnName = columns(idx)
+            val rawType = columnTypes(columnName)
+            row.addColumns(
+              Column.newBuilder().setName(columnName).setData(soqlValueToRawValue(rawType, salesforceValue)))
           }
           row.build()
         }
@@ -246,8 +239,7 @@ abstract class DASSalesforceTable(
         Column
           .newBuilder()
           .setName("id")
-          .setData(Value.newBuilder().setString(ValueString.newBuilder().setV(id).build()).build())
-      )
+          .setData(Value.newBuilder().setString(ValueString.newBuilder().setV(id).build()).build()))
       .build()
   }
 
@@ -271,8 +263,7 @@ abstract class DASSalesforceTable(
       quals: Seq[Qual],
       columns: Seq[String],
       maybeSortKeys: Seq[SortKey],
-      maybeLimit: Option[Long]
-  ): String = {
+      maybeLimit: Option[Long]): String = {
     val salesforceColumns = columns.distinct.map(renameToSalesforce)
     var soql = {
       if (salesforceColumns.isEmpty) {
@@ -330,12 +321,12 @@ abstract class DASSalesforceTable(
       val value = q.getSimpleQual.getValue // at this point we know it's a SimpleQual
       val op = q.getSimpleQual.getOperator
       val soqlOp = op match {
-        case Operator.EQUALS => "="
-        case Operator.GREATER_THAN => ">"
+        case Operator.EQUALS                => "="
+        case Operator.GREATER_THAN          => ">"
         case Operator.GREATER_THAN_OR_EQUAL => ">="
-        case Operator.LESS_THAN => "<"
-        case Operator.LESS_THAN_OR_EQUAL => "<="
-        case Operator.NOT_EQUALS => "<>"
+        case Operator.LESS_THAN             => "<"
+        case Operator.LESS_THAN_OR_EQUAL    => "<="
+        case Operator.NOT_EQUALS            => "<>"
         case _ =>
           logger.warn(s"Unsupported operator: $op")
           return None
@@ -351,9 +342,7 @@ abstract class DASSalesforceTable(
           val date = value.getDate
           Value
             .newBuilder()
-            .setTimestamp(
-              ValueTimestamp.newBuilder().setYear(date.getYear).setMonth(date.getMonth).setDay(date.getDay)
-            )
+            .setTimestamp(ValueTimestamp.newBuilder().setYear(date.getYear).setMonth(date.getMonth).setDay(date.getDay))
             .build()
         }
         Some(renameToSalesforce(q.getName) + " " + soqlOp + " " + rawValueToSOQLValue(timestampValue))
@@ -370,9 +359,9 @@ abstract class DASSalesforceTable(
       else if (t.hasDouble) {
         val value = v match {
           case d: Double => d
-          case i: Int => i.toDouble
-          case l: Long => l.toDouble
-          case _ => throw new IllegalArgumentException(s"Unsupported value: $v")
+          case i: Int    => i.toDouble
+          case l: Long   => l.toDouble
+          case _         => throw new IllegalArgumentException(s"Unsupported value: $v")
         }
         Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(value).build()).build()
       } else if (t.hasDecimal) {
@@ -391,8 +380,7 @@ abstract class DASSalesforceTable(
               .setYear(localDate.getYear)
               .setMonth(localDate.getMonthValue)
               .setDay(localDate.getDayOfMonth)
-              .build()
-          )
+              .build())
           .build()
       } else if (t.hasTimestamp) {
         val str = v.asInstanceOf[String]
@@ -423,21 +411,19 @@ abstract class DASSalesforceTable(
               .setMinute(localDateTime.getMinute)
               .setSecond(localDateTime.getSecond)
               .setNano(localDateTime.getNano)
-              .build()
-          )
+              .build())
           .build()
       } else if (t.hasRecord) {
         logger.info(v.toString)
         val record = v.asInstanceOf[Map[String, Any]]
         val recordValue = ValueRecord.newBuilder()
         val typeMap = t.getRecord.getAttsList.asScala.map(att => att.getName -> att.getTipe).toMap
-        record.foreach {
-          case (k, v) =>
-            val fieldValue = typeMap.get(k) match {
-              case Some(fieldType) => soqlValueToRawValue(fieldType, v)
-              case None => anySoqlValueToRawValue(v)
-            }
-            recordValue.addAtts(ValueRecordAttr.newBuilder().setName(k).setValue(fieldValue).build())
+        record.foreach { case (k, v) =>
+          val fieldValue = typeMap.get(k) match {
+            case Some(fieldType) => soqlValueToRawValue(fieldType, v)
+            case None            => anySoqlValueToRawValue(v)
+          }
+          recordValue.addAtts(ValueRecordAttr.newBuilder().setName(k).setValue(fieldValue).build())
         }
         Value.newBuilder().setRecord(recordValue.build()).build()
       } else if (t.hasAny) anySoqlValueToRawValue(v)
@@ -450,16 +436,15 @@ abstract class DASSalesforceTable(
 
   private def anySoqlValueToRawValue(v: Any): Value = {
     v match {
-      case null => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
-      case s: String => Value.newBuilder().setString(ValueString.newBuilder().setV(s).build()).build()
-      case i: Int => Value.newBuilder().setInt(ValueInt.newBuilder().setV(i).build()).build()
-      case d: Double => Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(d).build()).build()
+      case null       => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
+      case s: String  => Value.newBuilder().setString(ValueString.newBuilder().setV(s).build()).build()
+      case i: Int     => Value.newBuilder().setInt(ValueInt.newBuilder().setV(i).build()).build()
+      case d: Double  => Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(d).build()).build()
       case b: Boolean => Value.newBuilder().setBool(ValueBool.newBuilder().setV(b).build()).build()
       case m: Map[_, _] =>
         val record = ValueRecord.newBuilder()
-        m.foreach {
-          case (k, v) =>
-            record.addAtts(ValueRecordAttr.newBuilder().setName(k.toString).setValue(anySoqlValueToRawValue(v)).build())
+        m.foreach { case (k, v) =>
+          record.addAtts(ValueRecordAttr.newBuilder().setName(k.toString).setValue(anySoqlValueToRawValue(v)).build())
         }
         Value.newBuilder().setRecord(record.build()).build()
       case t =>

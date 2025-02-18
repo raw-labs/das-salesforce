@@ -22,9 +22,7 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents an event, a calendar event such as a meeting or a task."
-      )
+      .setDescription("Represents an event, a calendar event such as a meeting or a task.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -66,17 +64,13 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("activity_date_time")
         .setDescription("Due Date and Time of the event.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("activity_date")
         .setDescription("Due Date of the event.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -88,17 +82,13 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("start_date_time")
         .setDescription("Start date and time of the event.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("end_date_time")
         .setDescription("End date and time of the event.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -140,9 +130,7 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The date and time the event was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -154,9 +142,7 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The last date and time the event was modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -168,11 +154,8 @@ class DASSalesforceEventTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("System Modstamp of the event.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

@@ -23,8 +23,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
-        "Represents an activity related to records such as Accounts, Contacts, Leads, Opportunities, and other Salesforce objects."
-      )
+        "Represents an activity related to records such as Accounts, Contacts, Leads, Opportunities, and other Salesforce objects.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -54,9 +53,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("activity_date")
         .setDescription("The due date of the task.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -92,9 +89,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The date and time when the task was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(false)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -106,9 +101,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time when the task was last modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -132,9 +125,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("reminder_date_time")
         .setDescription("The date and time for a task reminder.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -197,9 +188,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("recurrence_end_date_only")
         .setDescription("The end date of the recurring task series.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -212,8 +201,7 @@ class DASSalesforceTaskTable(connector: DASSalesforceConnector)
         .setName("recurrence_type")
         .setDescription("Specifies the type of recurrence (e.g., RecursDaily, RecursWeekly, etc.).")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

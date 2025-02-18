@@ -22,9 +22,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a contact, which is a person associated with an account."
-      )
+      .setDescription("Represents a contact, which is a person associated with an account.")
       .setStartupCost(1000)
     val columns = Seq(
       ColumnDefinition
@@ -85,9 +83,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("birthdate")
         .setDescription("The contact's birthdate.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -105,9 +101,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The Created Date.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -125,18 +119,14 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("email_bounced_date")
         .setDescription(
-          "If bounce management is activated and an email sent to the contact bounces, the date and time of the bounce."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "If bounce management is activated and an email sent to the contact bounces, the date and time of the bounce.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("email_bounced_reason")
         .setDescription(
-          "If bounce management is activated and an email sent to the contact bounces, the reason for the bounce."
-        )
+          "If bounce management is activated and an email sent to the contact bounces, the reason for the bounce.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -155,8 +145,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("individual_id")
         .setDescription(
-          "ID of the data privacy record associated with this contact. This field is available if Data Protection and Privacy is enabled."
-        )
+          "ID of the data privacy record associated with this contact. This field is available if Data Protection and Privacy is enabled.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -169,8 +158,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("is_email_bounced")
         .setDescription(
-          "If bounce management is activated and an email is sent to a contact, indicates whether the email bounced (true) or not (false)."
-        )
+          "If bounce management is activated and an email is sent to a contact, indicates whether the email bounced (true) or not (false).")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -183,35 +171,27 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("jigsaw_contact_id")
         .setDescription(
-          "References the company's ID in Data.com. If an account has a value in this field, it means that the account was imported from Data.com."
-        )
+          "References the company's ID in Data.com. If an account has a value in this field, it means that the account was imported from Data.com.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_activity_date")
         .setDescription(
-          "Value is the most recent of either: Due date of the most recent event logged against the record. Due date of the most recently close task associated with the record."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "Value is the most recent of either: Due date of the most recent event logged against the record. Due date of the most recently close task associated with the record.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_c_u_request_date")
         .setDescription("The Last Stay-in-Touch Request Date.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_c_u_update_date")
         .setDescription("The Last Stay-in-Touch Save Date.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -223,36 +203,27 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The Last Modified Date.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription(
-          "The timestamp when the current user last accessed this record, a record related to this record, or a list view."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last accessed this record, a record related to this record, or a list view.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription(
-          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (LastReferencedDate) but not viewed it."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (LastReferencedDate) but not viewed it.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("master_record_id")
         .setDescription(
-          "If this record was deleted as the result of a merge, this field contains the ID of the record that remains."
-        )
+          "If this record was deleted as the result of a merge, this field contains the ID of the record that remains.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -289,9 +260,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The System Modstamp.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -304,8 +273,7 @@ class DASSalesforceContactTable(connector: DASSalesforceConnector)
         .setName("mailing_address")
         .setDescription("The Mailing Address.")
         .setType(Type.newBuilder().setRecord(RecordType.newBuilder()).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

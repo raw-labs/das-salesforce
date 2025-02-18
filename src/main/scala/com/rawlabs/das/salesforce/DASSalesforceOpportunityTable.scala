@@ -22,9 +22,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents an opportunity, which is a sale or pending deal."
-      )
+      .setDescription("Represents an opportunity, which is a sale or pending deal.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -42,8 +40,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("amount")
         .setDescription(
-          "Estimated total sale amount. For opportunities with products, the amount is the sum of the related products."
-        )
+          "Estimated total sale amount. For opportunities with products, the amount is the sum of the related products.")
         .setType(Type.newBuilder().setDouble(DoubleType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -62,17 +59,14 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("campaign_id")
         .setDescription(
-          "ID of a related Campaign. This field is defined only for those organizations that have the campaign feature Campaigns enabled."
-        )
+          "ID of a related Campaign. This field is defined only for those organizations that have the campaign feature Campaigns enabled.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("close_date")
         .setDescription("Date when the opportunity is expected to close.")
-        .setType(
-          Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -84,9 +78,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The creation date and time of the opportunity.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -116,8 +108,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("forecast_category")
         .setDescription(
-          "Forecast category name displayed in reports, opportunity detail and edit pages, opportunity searches, and opportunity list views."
-        )
+          "Forecast category name displayed in reports, opportunity detail and edit pages, opportunity searches, and opportunity list views.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -136,8 +127,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("has_opportunity_line_item")
         .setDescription(
-          "Indicates whether the opportunity has associated line items. A value of true means that Opportunity line items have been created for the opportunity."
-        )
+          "Indicates whether the opportunity has associated line items. A value of true means that Opportunity line items have been created for the opportunity.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -174,11 +164,8 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_activity_date")
         .setDescription(
-          "Value is one of the following, whichever is the most recent of a) Due date of the most recent event logged against the record or b) Due date of the most recently closed task associated with the record."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "Value is one of the following, whichever is the most recent of a) Due date of the most recent event logged against the record or b) Due date of the most recently closed task associated with the record.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -190,9 +177,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The data and time of the last modification of the oppurtinity record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -210,8 +195,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("pricebook_2_id")
         .setDescription(
-          "ID of a related Pricebook2 object. The Pricebook2Id field indicates which Pricebook2 applies to this opportunity. The Pricebook2Id field is defined only for those organizations that have products enabled as a feature."
-        )
+          "ID of a related Pricebook2 object. The Pricebook2Id field indicates which Pricebook2 applies to this opportunity. The Pricebook2Id field is defined only for those organizations that have products enabled as a feature.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -243,8 +227,7 @@ class DASSalesforceOpportunityTable(connector: DASSalesforceConnector)
         .setName("type")
         .setDescription("Type of opportunity, such as Existing Business or New Business.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

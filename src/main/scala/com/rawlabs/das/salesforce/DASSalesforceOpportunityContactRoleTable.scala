@@ -22,9 +22,7 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents the role that a Contact plays on an Opportunity."
-      )
+      .setDescription("Represents the role that a Contact plays on an Opportunity.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -42,8 +40,7 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .newBuilder()
         .setName("is_primary")
         .setDescription(
-          "Indicates whether the associated Contact plays the primary role on the Opportunity (true) or not (false)."
-        )
+          "Indicates whether the associated Contact plays the primary role on the Opportunity (true) or not (false).")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -56,8 +53,7 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .newBuilder()
         .setName("role")
         .setDescription(
-          "Name of the role played by the associated Contact on the Opportunity, such as Business User or Decision Maker."
-        )
+          "Name of the role played by the associated Contact on the Opportunity, such as Business User or Decision Maker.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -70,9 +66,7 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .newBuilder()
         .setName("created_date")
         .setDescription("Date and time of the creation of the contact role record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -84,11 +78,8 @@ class DASSalesforceOpportunityContactRoleTable(connector: DASSalesforceConnector
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Date of most recent change in the contact role record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

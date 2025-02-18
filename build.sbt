@@ -1,5 +1,4 @@
 import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
-import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.Universal
 import sbt.*
 import sbt.Keys.*
 
@@ -52,9 +51,7 @@ lazy val compileSettings = Seq(
     "Automatic-Module-Name" -> name.value.replace('-', '.')
   ),
   // Ensure Java annotations get compiled first, so that they are accessible from Scala.
-  compileOrder := CompileOrder.JavaThenScala,
-  // Ensure we fork new JVM for run, so we can set JVM flags.
-  Compile / run / fork := true
+  compileOrder := CompileOrder.JavaThenScala
 )
 
 lazy val testSettings = Seq(
@@ -114,14 +111,13 @@ lazy val root = (project in file("."))
     )
   )
 
-val arch = sys.env.getOrElse("ARCH", "amd64")
 val amzn_jdk_version = "21.0.4.7-1"
-val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_${arch}.deb"
+val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb"
 val amzn_corretto_bin_dl_url = s"https://corretto.aws/downloads/resources/${amzn_jdk_version.replace('-', '.')}"
 
 lazy val dockerSettings = strictBuildSettings ++ Seq(
   name := "das-salesforce-server",
-  dockerBaseImage := s"debian:bookworm-slim",
+  dockerBaseImage := s"--platform=amd64 debian:bookworm-slim",
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-salesforce-server",
@@ -204,8 +200,6 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
       case None => Seq(baseAlias)
     }
   }
-
-
 )
 
 lazy val docker = (project in file("docker"))
@@ -216,5 +210,5 @@ lazy val docker = (project in file("docker"))
   .settings(
     strictBuildSettings,
     dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.3.0" % "compile->compile;test->test",
+    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.3.0" % "compile->compile;test->test"
   )

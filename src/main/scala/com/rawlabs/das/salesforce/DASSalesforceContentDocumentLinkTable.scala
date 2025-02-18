@@ -23,8 +23,7 @@ class DASSalesforceContentDocumentLinkTable(connector: DASSalesforceConnector)
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
-        "Represents the link between a Salesforce CRM Content document (ContentDocument) and where it's shared (LinkedEntityId)."
-      )
+        "Represents the link between a Salesforce CRM Content document (ContentDocument) and where it's shared (LinkedEntityId).")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -54,9 +53,7 @@ class DASSalesforceContentDocumentLinkTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The system modstamp for the content document link.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -69,8 +66,7 @@ class DASSalesforceContentDocumentLinkTable(connector: DASSalesforceConnector)
         .setName("visibility")
         .setDescription("The visibility level of the document link (e.g., AllUsers, InternalUsers, SharedUsers).")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(false)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

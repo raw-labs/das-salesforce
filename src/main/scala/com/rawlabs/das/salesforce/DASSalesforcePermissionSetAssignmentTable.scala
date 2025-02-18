@@ -22,9 +22,7 @@ class DASSalesforcePermissionSetAssignmentTable(connector: DASSalesforceConnecto
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents the association between a User and a PermissionSet."
-      )
+      .setDescription("Represents the association between a User and a PermissionSet.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -54,11 +52,8 @@ class DASSalesforcePermissionSetAssignmentTable(connector: DASSalesforceConnecto
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The Date Assigned.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

@@ -22,9 +22,7 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents an order associated with a contract or an account."
-      )
+      .setDescription("Represents an order associated with a contract or an account.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -60,8 +58,7 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("status")
         .setDescription(
-          "The Status field specifies the current state of an order. Status strings represent its current state (Draft or Activated)."
-        )
+          "The Status field specifies the current state of an order. Status strings represent its current state (Draft or Activated).")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -86,9 +83,7 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("activated_date")
         .setDescription("Date and time when the order was activated.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -112,16 +107,13 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("company_authorized_date")
         .setDescription("The date on which your organization authorized the order.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("contract_id")
         .setDescription(
-          "ID of the contract associated with this order. Can only be updated when the order's StatusCode value is Draft."
-        )
+          "ID of the contract associated with this order. Can only be updated when the order's StatusCode value is Draft.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -134,9 +126,7 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("Creation date and time of the order record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -148,9 +138,7 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("customer_authorized_date")
         .setDescription("Date on which the contact authorized the order.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -162,17 +150,13 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("effective_date")
         .setDescription("Date at which the order becomes effective.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("end_date")
         .setDescription("Date at which the order ends.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -196,29 +180,21 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Date of most recent change in the order record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription(
-          "The timestamp when the current user last accessed this record, a record related to this record, or a list view."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last accessed this record, a record related to this record, or a list view.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription(
-          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (LastReferencedDate) but not viewed it."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (LastReferencedDate) but not viewed it.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -230,17 +206,14 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("original_order_id")
         .setDescription(
-          "Optional. ID of the original order that a reduction order is reducing, if the reduction order is reducing a single order."
-        )
+          "Optional. ID of the original order that a reduction order is reducing, if the reduction order is reducing a single order.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("po_date")
         .setDescription("Date of the purchase order.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -270,17 +243,14 @@ class DASSalesforceOrderTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The date and time when order record was last modified by a user or by an automated process.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("shipping_address")
         .setDescription("The shipping adress for the order.")
         .setType(Type.newBuilder().setRecord(RecordType.newBuilder()).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

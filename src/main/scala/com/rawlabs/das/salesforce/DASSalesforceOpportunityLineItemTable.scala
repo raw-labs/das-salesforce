@@ -23,8 +23,7 @@ class DASSalesforceOpportunityLineItemTable(connector: DASSalesforceConnector)
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
-        "Represents a product added to an opportunity in Salesforce, storing details such as product ID, quantity, price, etc."
-      )
+        "Represents a product added to an opportunity in Salesforce, storing details such as product ID, quantity, price, etc.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -96,9 +95,7 @@ class DASSalesforceOpportunityLineItemTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("service_date")
         .setDescription("The date when the service or product is delivered.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -110,9 +107,7 @@ class DASSalesforceOpportunityLineItemTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The date and time when the opportunity line item was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(false)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(false)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -124,9 +119,7 @@ class DASSalesforceOpportunityLineItemTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time when the opportunity line item was last modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -138,9 +131,7 @@ class DASSalesforceOpportunityLineItemTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The timestamp for system modifications.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -152,19 +143,14 @@ class DASSalesforceOpportunityLineItemTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription("The date when the opportunity line item was last viewed.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription("The date when the opportunity line item was last referenced.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

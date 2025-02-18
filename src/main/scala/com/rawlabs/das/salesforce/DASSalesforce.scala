@@ -68,8 +68,7 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
     caseTable,
     contentDocumentTable,
     contentDocumentLinkTable,
-    contentVersionTable
-  )
+    contentVersionTable)
 
   private val dynamicTableNames = {
     options.get("dynamic_objects") match {

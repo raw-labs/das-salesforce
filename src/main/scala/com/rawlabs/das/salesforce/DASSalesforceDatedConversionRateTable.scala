@@ -21,9 +21,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents the dated conversion rates for a currency pair."
-      )
+      .setDescription("Represents the dated conversion rates for a currency pair.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -47,8 +45,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("next_start_date")
         .setDescription(
-          "The date on which the next effective dated exchange rate will start. Effectively the day after the end date for this exchange rate."
-        )
+          "The date on which the next effective dated exchange rate will start. Effectively the day after the end date for this exchange rate.")
         .setType(Type.newBuilder().setDate(DateType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -61,9 +58,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("Created Date.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -75,9 +70,7 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Last Modified Date.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -89,11 +82,8 @@ class DASSalesforceDatedConversionRateTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("System Modstamp.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

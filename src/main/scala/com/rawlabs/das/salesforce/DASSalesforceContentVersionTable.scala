@@ -22,9 +22,7 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a specific version of a Salesforce CRM Content document or Salesforce File."
-      )
+      .setDescription("Represents a specific version of a Salesforce CRM Content document or Salesforce File.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -114,9 +112,7 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("content_modified_date")
         .setDescription("The date and time when the content was last modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -146,9 +142,7 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("featured_content_date")
         .setDescription("The date when the content was featured.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -166,9 +160,7 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The date and time the content version was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -180,17 +172,13 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time the content version was last modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The system modstamp for the content version.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -287,8 +275,7 @@ class DASSalesforceContentVersionTable(connector: DASSalesforceConnector)
         .setName("is_asset_enabled")
         .setDescription("Indicates if the content version is asset-enabled (true/false).")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

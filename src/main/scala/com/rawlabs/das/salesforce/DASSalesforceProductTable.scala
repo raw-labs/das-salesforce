@@ -22,9 +22,7 @@ class DASSalesforceProductTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a product that org sells."
-      )
+      .setDescription("Represents a product that org sells.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -54,8 +52,7 @@ class DASSalesforceProductTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("is_active")
         .setDescription(
-          "Indicates that the product is ready for use in a price book, opportunity, or quote, and whether you can see the product in views."
-        )
+          "Indicates that the product is ready for use in a price book, opportunity, or quote, and whether you can see the product in views.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -68,9 +65,7 @@ class DASSalesforceProductTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("Date and time of the creation of the product role record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -118,27 +113,20 @@ class DASSalesforceProductTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Date of most recent change in the product record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription("The timestamp when the current user last viewed product record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription(
-          "The timestamp when the current user last viewed this record. If this value is null, this record might only have been referenced (last_referenced_date) and not viewed by the current user."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last viewed this record. If this value is null, this record might only have been referenced (last_referenced_date) and not viewed by the current user.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -157,8 +145,7 @@ class DASSalesforceProductTable(connector: DASSalesforceConnector)
         .setName("system_modstamp")
         .setDescription("The date and time when order record was last modified by a user or by an automated process.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

@@ -22,9 +22,7 @@ class DASSalesforceUserTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a user in organization."
-      )
+      .setDescription("Represents a user in organization.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -66,8 +64,7 @@ class DASSalesforceUserTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("account_id")
         .setDescription(
-          "ID of the Account associated with a Customer Portal user. This field is null for Salesforce users."
-        )
+          "ID of the Account associated with a Customer Portal user. This field is null for Salesforce users.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -98,11 +95,8 @@ class DASSalesforceUserTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_login_date")
         .setDescription(
-          "The date and time when the user last successfully logged in. This value is updated if 60 seconds elapses since the user's last login."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The date and time when the user last successfully logged in. This value is updated if 60 seconds elapses since the user's last login.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -126,11 +120,9 @@ class DASSalesforceUserTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("user_type")
         .setDescription(
-          "The category of user license. Can be one of Standard, PowerPartner, CSPLitePortal, CustomerSuccess, PowerCustomerSuccess, CsnOnly, and Guest."
-        )
+          "The category of user license. Can be one of Standard, PowerPartner, CSPLitePortal, CustomerSuccess, PowerCustomerSuccess, CsnOnly, and Guest.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

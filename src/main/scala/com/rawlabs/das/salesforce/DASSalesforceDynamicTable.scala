@@ -18,8 +18,7 @@ class DASSalesforceDynamicTable(connector: DASSalesforceConnector, objectName: S
     extends DASSalesforceTable(
       connector,
       s"salesforce_${DASSalesforceUtils.renameFromSalesforce(objectName)}",
-      objectName
-    ) {
+      objectName) {
 
   override def tableDefinition: TableDefinition = {
     val tbl = TableDefinition

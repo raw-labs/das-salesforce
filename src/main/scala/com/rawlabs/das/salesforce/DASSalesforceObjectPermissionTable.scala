@@ -22,9 +22,7 @@ class DASSalesforceObjectPermissionTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents the enabled object permissions for the parent PermissionSet."
-      )
+      .setDescription("Represents the enabled object permissions for the parent PermissionSet.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -48,24 +46,21 @@ class DASSalesforceObjectPermissionTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("permissions_create")
         .setDescription(
-          "If true, users assigned to the parent PermissionSet can create records for this object. Requires PermissionsRead for the same object to be true."
-        )
+          "If true, users assigned to the parent PermissionSet can create records for this object. Requires PermissionsRead for the same object to be true.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("permissions_delete")
         .setDescription(
-          "If true, users assigned to the parent PermissionSet can delete records for this object. Requires PermissionsRead and PermissionsEdit for the same object to be true."
-        )
+          "If true, users assigned to the parent PermissionSet can delete records for this object. Requires PermissionsRead and PermissionsEdit for the same object to be true.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("permissions_edit")
         .setDescription(
-          "If true, users assigned to the parent PermissionSet can edit records for this object. Requires PermissionsRead for the same object to be true."
-        )
+          "If true, users assigned to the parent PermissionSet can edit records for this object. Requires PermissionsRead for the same object to be true.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -78,19 +73,16 @@ class DASSalesforceObjectPermissionTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("permissions_modify_all_records")
         .setDescription(
-          "If true, users assigned to the parent PermissionSet can edit all records for this object, regardless of sharing settings. Requires PermissionsRead, PermissionsDelete, PermissionsEdit, and PermissionsViewAllRecords for the same object to be true."
-        )
+          "If true, users assigned to the parent PermissionSet can edit all records for this object, regardless of sharing settings. Requires PermissionsRead, PermissionsDelete, PermissionsEdit, and PermissionsViewAllRecords for the same object to be true.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("permissions_view_all_records")
         .setDescription(
-          "If true, users assigned to the parent PermissionSet can view all records for this object, regardless of sharing settings. Requires PermissionsRead for the same object to be true."
-        )
+          "If true, users assigned to the parent PermissionSet can view all records for this object, regardless of sharing settings. Requires PermissionsRead for the same object to be true.")
         .setType(Type.newBuilder().setBool(BoolType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

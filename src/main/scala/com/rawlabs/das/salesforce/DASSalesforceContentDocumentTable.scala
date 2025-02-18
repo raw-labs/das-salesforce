@@ -23,8 +23,7 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
-        "Represents a document that has been uploaded to a library in Salesforce CRM Content or Salesforce Files."
-      )
+        "Represents a document that has been uploaded to a library in Salesforce CRM Content or Salesforce Files.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -42,9 +41,7 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The date and time when the document was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -56,9 +53,7 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time when the document was last modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -76,9 +71,7 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("archived_date")
         .setDescription("The date when the document was archived.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -96,9 +89,7 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The system modstamp of the document.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -128,17 +119,13 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription("The date and time when the document was last viewed.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription("The date and time when the document was last referenced.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -180,17 +167,14 @@ class DASSalesforceContentDocumentTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("content_modified_date")
         .setDescription("The date and time when the document content was last modified.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("content_asset_id")
         .setDescription("The ID of the content asset associated with the document.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

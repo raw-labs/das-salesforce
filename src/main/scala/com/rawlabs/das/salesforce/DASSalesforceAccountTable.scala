@@ -23,8 +23,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
       .setDescription(
-        "Represents an individual account, which is an organization or person involved with business (such as customers, competitors, and partners)."
-      )
+        "Represents an individual account, which is an organization or person involved with business (such as customers, competitors, and partners).")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -54,8 +53,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("owner_id")
         .setDescription(
-          "The ID of the user who currently owns this account. Default value is the user logged in to the API to perform the create."
-        )
+          "The ID of the user who currently owns this account. Default value is the user logged in to the API to perform the create.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -74,8 +72,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("clean_status")
         .setDescription(
-          "Indicates the record's clean status as compared with Data.com. Values are: Matched, Different,Acknowledged,NotFound,Inactive,Pending, SelectMatch, or Skipped."
-        )
+          "Indicates the record's clean status as compared with Data.com. Values are: Matched, Different,Acknowledged,NotFound,Inactive,Pending, SelectMatch, or Skipped.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -88,9 +85,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("The creation date and time of the account.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -107,18 +102,14 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_by_id")
-        .setDescription(
-          "The id of the user who last changed the contact fields, including modification date and time."
-        )
+        .setDescription("The id of the user who last changed the contact fields, including modification date and time.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time of last modification to account.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -148,8 +139,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("sic")
         .setDescription(
-          "Standard Industrial Classification code of the company's main business categorization, for example, 57340 for Electronics."
-        )
+          "Standard Industrial Classification code of the company's main business categorization, for example, 57340 for Electronics.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -162,8 +152,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("tradestyle")
         .setDescription(
-          "A name, different from its legal name, that an org may use for conducting business. Similar to “Doing business as” or \"DBA\"."
-        )
+          "A name, different from its legal name, that an org may use for conducting business. Similar to “Doing business as” or \"DBA\".")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -183,8 +172,7 @@ class DASSalesforceAccountTable(connector: DASSalesforceConnector)
         .setName("shipping_address")
         .setDescription("The shipping address of the account.")
         .setType(Type.newBuilder().setRecord(RecordType.newBuilder()).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

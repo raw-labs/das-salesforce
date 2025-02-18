@@ -22,9 +22,7 @@ class DASSalesforceLeadTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a prospect or lead."
-      )
+      .setDescription("Represents a prospect or lead.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -84,9 +82,7 @@ class DASSalesforceLeadTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("converted_date")
         .setDescription("Date on which this lead was converted.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -98,9 +94,7 @@ class DASSalesforceLeadTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("Creation date and time of the lead.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -118,9 +112,7 @@ class DASSalesforceLeadTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("Date and time of the last changes to lead record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -151,8 +143,7 @@ class DASSalesforceLeadTable(connector: DASSalesforceConnector)
         .setName("website")
         .setDescription("URL of the lead's company's website.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
-        .build()
-    )
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()

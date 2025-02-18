@@ -22,9 +22,7 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
     val tbl = TableDefinition
       .newBuilder()
       .setTableId(TableId.newBuilder().setName(tableName))
-      .setDescription(
-        "Represents a contract (a business agreement) associated with an Account."
-      )
+      .setDescription("Represents a contract (a business agreement) associated with an Account.")
     val columns = Seq(
       ColumnDefinition
         .newBuilder()
@@ -54,11 +52,8 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("end_date")
         .setDescription(
-          "Calculated end date of the contract. This value is calculated by adding the ContractTerm to the start_date."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "Calculated end date of the contract. This value is calculated by adding the ContractTerm to the start_date.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -70,16 +65,13 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("start_date")
         .setDescription("Start date for this contract.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("status")
         .setDescription(
-          "The picklist of values that indicate order status. A contract can be Draft, InApproval, or Activated."
-        )
+          "The picklist of values that indicate order status. A contract can be Draft, InApproval, or Activated.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -92,9 +84,7 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("activated_date")
         .setDescription("Date and time when this contract was activated.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -106,9 +96,7 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("company_signed_date")
         .setDescription("Date on which the contract was signed by organization.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -126,17 +114,13 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("created_date")
         .setDescription("Date and time when contract record was created.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("customer_signed_date")
         .setDescription("Date on which the customer signed the contract.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -166,19 +150,14 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_activity_date")
         .setDescription(
-          "Value is one of the following, whichever is the most recent. a) Due date of the most recent event logged against the record. b) Due date of the most recently closed task associated with the record."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "Value is one of the following, whichever is the most recent. a) Due date of the most recent event logged against the record. b) Due date of the most recently closed task associated with the record.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_approved_date")
         .setDescription("Last date the contract was approved.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
@@ -190,36 +169,27 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("last_modified_date")
         .setDescription("The date and time of the last change to contract record.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_referenced_date")
         .setDescription(
-          "The timestamp when the current user last accessed this record, a record related to this record, or a list view."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last accessed this record, a record related to this record, or a list view.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("last_viewed_date")
         .setDescription(
-          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (last_referenced_date) but not viewed it."
-        )
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
+          "The timestamp when the current user last viewed this record or list view. If this value is null, the user might have only accessed this record or list view (last_referenced_date) but not viewed it.")
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
         .newBuilder()
         .setName("owner_expiration_notice")
         .setDescription(
-          "Number of days ahead of the contract end date (15, 30, 45, 60, 90, and 120). Used to notify the owner in advance that the contract is ending."
-        )
+          "Number of days ahead of the contract end date (15, 30, 45, 60, 90, and 120). Used to notify the owner in advance that the contract is ending.")
         .setType(Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build())
         .build(),
       ColumnDefinition
@@ -238,11 +208,8 @@ class DASSalesforceContractTable(connector: DASSalesforceConnector)
         .newBuilder()
         .setName("system_modstamp")
         .setDescription("The date and time when contract was last modified by a user or by an automated process.")
-        .setType(
-          Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build()
-        )
-        .build()
-    )
+        .setType(Type.newBuilder().setTimestamp(TimestampType.newBuilder().setNullable(true)).build())
+        .build())
     fixHiddenAndDynamicColumns(columns).foreach(tbl.addColumns)
     tbl.setStartupCost(1000)
     tbl.build()
