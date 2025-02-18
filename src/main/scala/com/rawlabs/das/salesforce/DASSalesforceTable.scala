@@ -152,11 +152,21 @@ abstract class DASSalesforceTable(
   override def getTablePathKeys: Seq[PathKey] =
     Seq(PathKey.newBuilder().addKeyColumns(uniqueColumn).setExpectedRows(1).build())
 
-  override def explain(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey], maybeLimit: Option[Long]): Seq[String] = {
+  override def explain(
+      quals: Seq[Qual],
+      columns: Seq[String],
+      sortKeys: Seq[SortKey],
+      maybeLimit: Option[Long]
+  ): Seq[String] = {
     mkSOQL(quals, columns, sortKeys, maybeLimit).split("\n").toSeq
   }
 
-  override def execute(quals: Seq[Qual], columns: Seq[String], sortKeys: Seq[SortKey], maybeLimit: Option[Long]): DASExecuteResult = {
+  override def execute(
+      quals: Seq[Qual],
+      columns: Seq[String],
+      sortKeys: Seq[SortKey],
+      maybeLimit: Option[Long]
+  ): DASExecuteResult = {
     logger.debug(s"Executing query with columns: $columns, quals: $quals, sortKeys: $sortKeys")
 
     val soql = mkSOQL(quals, columns, sortKeys, maybeLimit)
