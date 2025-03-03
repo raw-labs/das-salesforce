@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.{ClassTagExtensions, DefaultScalaModule}
+import com.rawlabs.das.sdk.{DASSdkInvalidArgumentException, DASSdkUnauthenticatedException}
 import com.rawlabs.protocol.das.v1.tables.{Row => ProtoRow}
 import com.typesafe.scalalogging.StrictLogging
 
@@ -45,6 +46,8 @@ class DASSalesforceTest extends AnyFunSuite with StrictLogging {
     "url" -> sys.env("SALESFORCE_URL"),
     "dynamic_objects" -> mapper.readValue[Seq[String]](sys.env("SALESFORCE_OBJECTS")).mkString(","))
 
+  private val workingDAS = new DASSalesforce(options)
+
   // --------------------------------------------------------------------------
   // 1) Registration
   // --------------------------------------------------------------------------
@@ -55,16 +58,28 @@ class DASSalesforceTest extends AnyFunSuite with StrictLogging {
 
   test("Should fail to register Salesforce with missing options") {
     val missingOptions = options - "api_version"
-    // FIXME (msb): This doesn't seem to be the correct exception
-    assertThrows[NoSuchElementException] {
+    assertThrows[DASSdkInvalidArgumentException] {
       new DASSalesforce(missingOptions)
     }
   }
 
-  test("Should fail to register Salesforce with invalid options") {
-    val invalidOptions = options + ("security_token" -> "invalid")
-    // FIXME (msb): This doesn't seem to be the correct exception
-    assertThrows[com.force.api.AuthException] {
+  test("Should fail to register Salesforce with invalid username") {
+    val invalidOptions = options ++ Map("username" -> "invalid")
+    assertThrows[DASSdkUnauthenticatedException] {
+      new DASSalesforce(invalidOptions)
+    }
+  }
+
+  test("Should fail to register Salesforce with invalid url") {
+    val invalidOptions = options ++ Map("url" -> "http://example.com")
+    assertThrows[DASSdkUnauthenticatedException] {
+      new DASSalesforce(invalidOptions)
+    }
+  }
+
+  test("Should fail to register Salesforce with invalid url/host") {
+    val invalidOptions = options ++ Map("url" -> "http://thisdoesntexist.com")
+    assertThrows[DASSdkUnauthenticatedException] {
       new DASSalesforce(invalidOptions)
     }
   }
@@ -74,13 +89,11 @@ class DASSalesforceTest extends AnyFunSuite with StrictLogging {
   // --------------------------------------------------------------------------
 
   test("Should have some tables") {
-    val das = new DASSalesforce(options)
-    das.tableDefinitions.nonEmpty
+    workingDAS.tableDefinitions.nonEmpty
   }
 
   test("Account table definition should exist with expected columns") {
-    val das = new DASSalesforce(options)
-    val tableDef = das.tableDefinitions.find(_.getTableId.getName == "salesforce_account")
+    val tableDef = workingDAS.tableDefinitions.find(_.getTableId.getName == "salesforce_account")
     assert(tableDef.isDefined, "salesforce_account must be defined")
     val colNames = tableDef.get.getColumnsList
     val actualNames = colNames.asScala.map(_.getName)
@@ -162,8 +175,7 @@ class DASSalesforceTest extends AnyFunSuite with StrictLogging {
   // --------------------------------------------------------------------------
 
   test("Account table project + limit test") {
-    val das = new DASSalesforce(options)
-    val tableDef = das.getTable("salesforce_account")
+    val tableDef = workingDAS.getTable("salesforce_account")
     assert(tableDef.isDefined)
 
     val dt = tableDef.get
@@ -176,6 +188,32 @@ class DASSalesforceTest extends AnyFunSuite with StrictLogging {
     execResult.close()
 
     assert(rowsBuffer.size == 1)
+  }
+
+  test("salesforce_object_permission returns more than 2000 rows") {
+    val tableDef = workingDAS.getTable("salesforce_object_permission")
+    assert(tableDef.isDefined)
+
+    val dt = tableDef.get
+    val execResult = dt.execute(quals = Seq.empty, columns = Seq("id"), sortKeys = Seq.empty, maybeLimit = Some(2000L))
+
+    val rowsBuffer = scala.collection.mutable.ArrayBuffer.empty[ProtoRow]
+    while (execResult.hasNext) {
+      rowsBuffer += execResult.next()
+    }
+    execResult.close()
+
+    assert(rowsBuffer.size >= 2000, s"Expected at least 2000 rows, got ${rowsBuffer.size}")
+  }
+
+  test("salesforce_content_document_link fails to read if not filtering by ID") {
+    val tableDef = workingDAS.getTable("salesforce_content_document_link")
+    assert(tableDef.isDefined)
+
+    val dt = tableDef.get
+    assertThrows[DASSdkInvalidArgumentException] {
+      dt.execute(quals = Seq.empty, columns = Seq("id"), sortKeys = Seq.empty, maybeLimit = Some(1L))
+    }
   }
 
 }

@@ -37,17 +37,25 @@ class DASSalesforceConnector(options: Map[String, String]) extends StrictLogging
   }
 
   private val apiVersion = {
-    val v = options("api_version")
+    val v = options.getOrElse("api_version", throw new DASSdkInvalidArgumentException("api_version is required"))
     if (v.startsWith("v")) v else s"v$v"
   }
 
-  private val apiConfig = new ApiConfig()
-    .setApiVersionString(apiVersion)
-    .setUsername(options("username"))
-    .setPassword(options("password") + options("security_token"))
-    .setClientId(options("client_id"))
-    .setForceURL(options("url"))
-    .setObjectMapper(jsonMapper)
+  private val apiConfig = {
+    val userName = options.getOrElse("username", throw new DASSdkInvalidArgumentException("username is required"))
+    val password = options.getOrElse("password", throw new DASSdkInvalidArgumentException("password is required"))
+    val securityToken =
+      options.getOrElse("security_token", throw new DASSdkInvalidArgumentException("security_token is required"))
+    val clientId = options.getOrElse("client_id", throw new DASSdkInvalidArgumentException("client_id is required"))
+    val url = options.getOrElse("url", throw new DASSdkInvalidArgumentException("url is required"))
+    new ApiConfig()
+      .setApiVersionString(apiVersion)
+      .setUsername(userName)
+      .setPassword(password + securityToken)
+      .setClientId(clientId)
+      .setForceURL(url)
+      .setObjectMapper(jsonMapper)
+  }
 
   private val forceApi: ForceApi =
     withSalesforceException {
