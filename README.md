@@ -5,15 +5,16 @@
 
 ## Options
 
-| Name                  | Description                       | Default | Required |
-|-----------------------|-----------------------------------|---------|----------|
-| `api_version`         | Salesforce API version            |         | Yes      |
-| `username`            | Salesforce username               |         | Yes      |
-| `password`            | Salesforce password               |         | Yes      |
-| `security_token`      | Salesforce security token         |         | Yes      |
-| `client_id`           | Salesforce client id              |         | Yes      |
-| `url`                 | Salesforce URL                    |         | Yes      |
-| `add_dynamic_columns` | Add dynamic columns to the schema | `true`  | No       |
+| Name                  | Description                                  | Default | Required |
+|-----------------------|----------------------------------------------|---------|----------|
+| `api_version`         | Salesforce API version                       |         | Yes      |
+| `username`            | Salesforce username                          |         | Yes      |
+| `password`            | Salesforce password                          |         | Yes      |
+| `security_token`      | Salesforce security token                    |         | Yes      |
+| `client_id`           | Salesforce client id                         |         | Yes      |
+| `url`                 | Salesforce URL                               |         | Yes      |
+| `add_dynamic_columns` | Add dynamic columns to the schema            | `true`  | No       |
+| `dynamic_objects`     | List of dynamic objects to add to the schema |         | No       |
 
 ## How to use
 
