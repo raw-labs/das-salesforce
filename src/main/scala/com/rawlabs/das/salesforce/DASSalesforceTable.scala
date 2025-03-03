@@ -16,11 +16,11 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, MapHasAsJava}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
+import com.rawlabs.das.sdk.DASExecuteResult
 import com.rawlabs.das.sdk.scala.DASTable
 import com.rawlabs.das.sdk.scala.DASTable.TableEstimate
-import com.rawlabs.das.sdk.{DASExecuteResult, DASSdkException}
 import com.rawlabs.protocol.das.v1.query.{Operator, PathKey, Qual, SortKey}
 import com.rawlabs.protocol.das.v1.tables.{Column, ColumnDefinition, Row, TableDefinition}
 import com.rawlabs.protocol.das.v1.types._
@@ -79,7 +79,7 @@ abstract class DASSalesforceTable(
   case class SalesforceColumn(columnDefinition: ColumnDefinition, updatable: Boolean, createable: Boolean)
 
   def readColumnsFromTable(): Seq[SalesforceColumn] = {
-    val obj = connector.forceApi.describeSObject(salesforceObjectName)
+    val obj = connector.describeSObject(salesforceObjectName)
     obj.getFields.asScala.map { f =>
       val rawType = f.getType match {
         case "string"        => Type.newBuilder().setString(StringType.newBuilder().setNullable(true)).build()
@@ -166,55 +166,26 @@ abstract class DASSalesforceTable(
 
     val soql = mkSOQL(quals, columns, sortKeys, maybeLimit)
     logger.debug(s"Executing SOQL query: $soql")
-    val page = connector.forceApi.query(soql)
+    val pageIterator = connector.paginatedSOQL(soql)
 
-    val pageIterator = new Iterator[Seq[Row]] {
-
-      private var currentBatch = Option(page.getRecords.asScala) // We start with the first batch
-      private var nextUrl = Option(page.getNextRecordsUrl) // If there's a next URL, there are more rows
-
-      private val salesforceColumns = columns.map(renameToSalesforce)
-
-      override def hasNext: Boolean = {
-        // currentBatch is set to null when a page was consumed.
-        if (currentBatch.isEmpty) {
-          // 'next' did consume the last batch. If there's a next URL, there are more rows,
-          // fetch the next batch.
-          nextUrl.foreach { url =>
-            val nextPage = connector.forceApi.queryMore(url)
-            currentBatch = Option(nextPage.getRecords.asScala)
-            nextUrl = Option(nextPage.getNextRecordsUrl)
-          }
-        }
-        // If currentBatch is still null, there are no more rows.
-        currentBatch.nonEmpty
-      }
-
-      override def next(): Seq[Row] = {
-        assert(hasNext)
-        val rows = currentBatch.get.map { record =>
-          val row = Row.newBuilder()
-          salesforceColumns.zipWithIndex.foreach { case (salesforceColumn, idx) =>
-            val salesforceValue = record.get(salesforceColumn)
-            val columnName = columns(idx)
-            val rawType = columnTypes(columnName)
-            row.addColumns(
-              Column.newBuilder().setName(columnName).setData(soqlValueToRawValue(rawType, salesforceValue)))
-          }
-          row.build()
-        }
-        currentBatch = None
-        rows.toSeq
-      }
-    }
+    val salesforceColumns = columns.map(renameToSalesforce)
 
     new DASExecuteResult {
 
-      private val rows = pageIterator.flatten
+      private val rows = pageIterator.flatten.map { record =>
+        val row = Row.newBuilder()
+        salesforceColumns.zipWithIndex.foreach { case (salesforceColumn, idx) =>
+          val salesforceValue = record(salesforceColumn)
+          val columnName = columns(idx)
+          val rawType = columnTypes(columnName)
+          row.addColumns(Column.newBuilder().setName(columnName).setData(soqlValueToRawValue(rawType, salesforceValue)))
+        }
+        row.build()
+      }
 
       override def close(): Unit = {}
 
-      override def hasNext: Boolean = rows.nonEmpty
+      override def hasNext: Boolean = rows.hasNext
 
       override def next(): Row = {
         if (!hasNext) throw new NoSuchElementException("No more elements")
@@ -227,13 +198,14 @@ abstract class DASSalesforceTable(
   override def uniqueColumn: String = "id"
 
   override def insert(row: Row): Row = {
+    logger.debug(s"Inserting row: $row")
     val newData = row.getColumnsList.asScala
       .filter(kv => creatableFields.contains(kv.getName)) // ignore fields that are not creatable
       .map(kv => renameToSalesforce(kv.getName) -> rawValueToJavaValue(kv.getData))
       .filter(_._2 != null)
       .toMap
     // Append new "Id" to the row
-    val id = connector.forceApi.createSObject(salesforceObjectName, newData.asJava)
+    val id = connector.createSObject(salesforceObjectName, newData)
     row.toBuilder
       .addColumns(
         Column
@@ -244,19 +216,21 @@ abstract class DASSalesforceTable(
   }
 
   override def update(rowId: Value, newValues: Row): Row = {
+    logger.debug(s"Updating row with id $rowId and new values: $newValues")
     val id = rowId.getString.getV
     val newData = newValues.getColumnsList.asScala
       .filter(kv => updatableFields.contains(kv.getName)) // ignore fields that are not updatable
       .map(kv => renameToSalesforce(kv.getName) -> rawValueToJavaValue(kv.getData))
       .toMap
     logger.debug(s"Updating row with id $id and new values: $newData")
-    connector.forceApi.updateSObject(salesforceObjectName, id, newData.asJava)
+    connector.updateSObject(salesforceObjectName, id, newData)
     newValues
   }
 
   override def delete(rowId: Value): Unit = {
+    logger.debug(s"Deleting row with id $rowId")
     val id = rowId.getString.getV
-    connector.forceApi.deleteSObject(salesforceObjectName, id)
+    connector.deleteSObject(salesforceObjectName, id)
   }
 
   private def mkSOQL(
@@ -364,6 +338,13 @@ abstract class DASSalesforceTable(
           case _         => throw new IllegalArgumentException(s"Unsupported value: $v")
         }
         Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(value).build()).build()
+      } else if (t.hasLong) {
+        val value = v match {
+          case l: Long => l
+          case i: Int  => i.toLong
+          case _       => throw new IllegalArgumentException(s"Unsupported value: $v")
+        }
+        Value.newBuilder().setLong(ValueLong.newBuilder().setV(value).build()).build()
       } else if (t.hasDecimal) {
         val value = v.toString
         Value.newBuilder().setDecimal(ValueDecimal.newBuilder().setV(value).build()).build()
@@ -396,7 +377,7 @@ abstract class DASSalesforceTable(
               } catch {
                 case e: java.time.format.DateTimeParseException =>
                   logger.warn(s"Failed to parse timestamp: $str", e)
-                  throw new DASSdkException(s"Failed to parse timestamp: $str", e)
+                  throw new IllegalStateException(s"Failed to parse timestamp: $str", e)
               }
           }
         Value
@@ -414,7 +395,6 @@ abstract class DASSalesforceTable(
               .build())
           .build()
       } else if (t.hasRecord) {
-        logger.info(v.toString)
         val record = v.asInstanceOf[Map[String, Any]]
         val recordValue = ValueRecord.newBuilder()
         val typeMap = t.getRecord.getAttsList.asScala.map(att => att.getName -> att.getTipe).toMap
@@ -439,6 +419,7 @@ abstract class DASSalesforceTable(
       case null       => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
       case s: String  => Value.newBuilder().setString(ValueString.newBuilder().setV(s).build()).build()
       case i: Int     => Value.newBuilder().setInt(ValueInt.newBuilder().setV(i).build()).build()
+      case l: Long    => Value.newBuilder().setLong(ValueLong.newBuilder().setV(l).build()).build()
       case d: Double  => Value.newBuilder().setDouble(ValueDouble.newBuilder().setV(d).build()).build()
       case b: Boolean => Value.newBuilder().setBool(ValueBool.newBuilder().setV(b).build()).build()
       case m: Map[_, _] =>

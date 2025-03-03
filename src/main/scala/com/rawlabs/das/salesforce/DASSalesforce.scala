@@ -87,7 +87,7 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
 
   private val maybeDatedConversionRateTable: Option[DASSalesforceDatedConversionRateTable] = {
     try {
-      val description = connector.forceApi.describeSObject("DatedConversionRate")
+      val description = connector.describeSObject("DatedConversionRate")
       logger.info(s"Found DatedConversionRate (${description.getName})")
       Some(new DASSalesforceDatedConversionRateTable(connector))
     } catch {
