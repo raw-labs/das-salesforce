@@ -36,8 +36,13 @@ class DASSalesforceConnector(options: Map[String, String]) extends StrictLogging
     registerModule(DefaultScalaModule)
   }
 
+  private val apiVersion = {
+    val v = options("api_version")
+    if (v.startsWith("v")) v else s"v$v"
+  }
+
   private val apiConfig = new ApiConfig()
-    .setApiVersionString(options("api_version"))
+    .setApiVersionString(apiVersion)
     .setUsername(options("username"))
     .setPassword(options("password") + options("security_token"))
     .setClientId(options("client_id"))
