@@ -98,7 +98,11 @@ lazy val root = (project in file("."))
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.18.2",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"))
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"
+      )
+      ,
+      dockerSettings
+  )
 
 lazy val dockerSettings = Seq(
   Docker/ packageName := "das-salesforce-server",
