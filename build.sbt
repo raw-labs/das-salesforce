@@ -1,7 +1,7 @@
 import java.nio.file.Paths
 
-import sbt.*
-import sbt.Keys.*
+import sbt.Keys._
+import sbt._
 
 import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
 
@@ -19,6 +19,7 @@ lazy val commonSettings = Seq(
   // Use cached resolution of dependencies
   // http://www.scala-sbt.org/0.13/docs/Cached-Resolution.html
   updateOptions := updateOptions.in(Global).value.withCachedResolution(true),
+  resolvers ++= Seq(Resolver.mavenLocal),
   resolvers += "RAW Labs GitHub Packages" at "https://maven.pkg.github.com/raw-labs/_")
 
 lazy val buildSettings = Seq(
@@ -42,7 +43,9 @@ lazy val compileSettings = Seq(
   Compile / packageBin / packageOptions += Package.ManifestAttributes(
     "Automatic-Module-Name" -> name.value.replace('-', '.')),
   // Ensure Java annotations get compiled first, so that they are accessible from Scala.
-  compileOrder := CompileOrder.JavaThenScala)
+  compileOrder := CompileOrder.JavaThenScala,
+  Compile / mainClass := Some("com.rawlabs.das.server.DASServer")
+  )
 
 lazy val testSettings = Seq(
   // Ensuring tests are run in a forked JVM for isolation.
@@ -51,7 +54,7 @@ lazy val testSettings = Seq(
   // Test / parallelExecution := false,
   // Pass system properties starting with "raw." to the forked JVMs.
   Test / javaOptions ++= {
-    import scala.collection.JavaConverters.*
+    import scala.collection.JavaConverters._
     val props = System.getProperties
     props
       .stringPropertyNames()
@@ -79,6 +82,7 @@ lazy val strictBuildSettings =
   commonSettings ++ compileSettings ++ buildSettings ++ testSettings ++ Seq(scalacOptions ++= Seq("-Xfatal-warnings"))
 
 lazy val root = (project in file("."))
+  .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(
     name := "das-salesforce",
     strictBuildSettings,
@@ -94,56 +98,36 @@ lazy val root = (project in file("."))
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.18.2",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"))
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"
+      )
+      ,
+      dockerSettings
+  )
 
-val amzn_jdk_version = "21.0.4.7-1"
-val amzn_corretto_bin = s"java-21-amazon-corretto-jdk_${amzn_jdk_version}_amd64.deb"
-val amzn_corretto_bin_dl_url = s"https://corretto.aws/downloads/resources/${amzn_jdk_version.replace('-', '.')}"
-
-lazy val dockerSettings = strictBuildSettings ++ Seq(
-  name := "das-salesforce-server",
-  dockerBaseImage := s"--platform=amd64 debian:bookworm-slim",
+lazy val dockerSettings = Seq(
+  Docker/ packageName := "das-salesforce-server",
+  dockerBaseImage := "eclipse-temurin:21-jre",
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
     "product" -> "das-salesforce-server",
     "image-type" -> "final",
     "org.opencontainers.image.source" -> "https://github.com/raw-labs/das-salesforce"),
   Docker / daemonUser := "raw",
+  Docker / daemonUserUid := Some("1001"),
+  Docker / daemonGroup := "raw",
+  Docker / daemonGroupGid := Some("1001"),
   dockerExposedVolumes := Seq("/var/log/raw"),
   dockerExposedPorts := Seq(50051),
   dockerEnvVars := Map("PATH" -> s"${(Docker / defaultLinuxInstallLocation).value}/bin:$$PATH"),
-  // We remove the automatic switch to USER 1001:0.
-  // We we want to run as root to install the JDK, also later we will switch to a non-root user.
-  dockerCommands := dockerCommands.value.filterNot {
-    case Cmd("USER", args @ _*) => args.contains("1001:0")
-    case cmd                    => false
-  },
-  dockerCommands ++= Seq(
-    Cmd(
-      "RUN",
-      s"""set -eux \\
-      && apt-get update \\
-      && apt-get install -y --no-install-recommends \\
-        curl wget ca-certificates gnupg software-properties-common fontconfig java-common \\
-      && wget $amzn_corretto_bin_dl_url/$amzn_corretto_bin \\
-      && dpkg --install $amzn_corretto_bin \\
-      && rm -f $amzn_corretto_bin \\
-      && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \\
-          wget gnupg software-properties-common"""),
-    Cmd("USER", "raw")),
   dockerEnvVars += "LANG" -> "C.UTF-8",
-  dockerEnvVars += "JAVA_HOME" -> "/usr/lib/jvm/java-21-amazon-corretto",
-  Compile / doc / sources := Seq.empty, // Do not generate scaladocs
-  // Skip docs to speed up build
-  Compile / packageDoc / mappings := Seq(),
   updateOptions := updateOptions.value.withLatestSnapshots(true),
   Linux / linuxPackageMappings += packageTemplateMapping(s"/var/lib/${packageName.value}")(),
   bashScriptDefines := {
     val ClasspathPattern = "declare -r app_classpath=\"(.*)\"\n".r
     bashScriptDefines.value.map {
       case ClasspathPattern(classpath) => s"""
-                                             |declare -r app_classpath="$${app_home}/../conf:$classpath"
-                                             |""".stripMargin
+        |declare -r app_classpath="$${app_home}/../conf:$classpath"
+        |""".stripMargin
       case _ @entry => entry
     }
   },
@@ -163,8 +147,6 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     }
     case lm @ _ => lm
   },
-  Compile / mainClass := Some("com.rawlabs.das.server.DASServer"),
-  Docker / dockerAutoremoveMultiStageIntermediateImages := false,
   dockerAlias := dockerAlias.value.withTag(Option(version.value.replace("+", "-"))),
   dockerAliases := {
     val devRegistry = sys.env.getOrElse("DEV_REGISTRY", "ghcr.io/raw-labs/das-salesforce")
@@ -177,10 +159,11 @@ lazy val dockerSettings = strictBuildSettings ++ Seq(
     }
   })
 
-lazy val docker = (project in file("docker"))
-  .dependsOn(root % "compile->compile;test->test")
-  .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(
-    strictBuildSettings,
-    dockerSettings,
-    libraryDependencies += "com.raw-labs" %% "das-server-scala" % "0.4.1" % "compile->compile;test->test")
+lazy val printDockerImageName = taskKey[Unit]("Prints the full Docker image name that will be produced")
+
+printDockerImageName := {
+  // Get the main Docker alias (the first one in the sequence)
+  val alias = (Docker / dockerAliases).value.head
+  // The toString method already returns the full image name with registry and tag
+  println(s"DOCKER_IMAGE=${alias}")
+}
