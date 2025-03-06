@@ -101,6 +101,10 @@ lazy val root = (project in file("."))
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"
       )
       ,
+      dependencyOverrides ++= Seq(
+        "io.netty" % "netty-handler" % "4.1.118.Final",
+        "com.google.protobuf" % "protobuf-java" % "3.25.5"
+      ),
       dockerSettings
   )
 
