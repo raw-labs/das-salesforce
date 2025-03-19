@@ -108,10 +108,14 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
 
   override def tableDefinitions: Seq[TableDefinition] = definitions
 
-  override def functionDefinitions: Seq[FunctionDefinition] = Seq.empty
-
   override def getTable(name: String): Option[DASTable] = allTables.find(_.tableName == name)
 
-  override def getFunction(name: String): Option[DASFunction] = None
+  private val allFunctions = Seq(new DASSalesforceSOQLFunction(q => connector.paginatedSOQL(q).flatten.toSeq))
+    .map(f => f.definition.getFunctionId.getName -> f)
+    .toMap
+
+  override def functionDefinitions: Seq[FunctionDefinition] = allFunctions.values.map(_.definition).toSeq
+
+  override def getFunction(name: String): Option[DASFunction] = allFunctions.get(name)
 
 }
