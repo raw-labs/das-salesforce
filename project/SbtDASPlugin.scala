@@ -5,7 +5,6 @@ import com.typesafe.sbt.SbtNativePackager.{Docker, Linux}
 import com.typesafe.sbt.packager.Keys.*
 import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerLayerMappings
-//import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.*
 import com.typesafe.sbt.packager.docker.{DockerPlugin, LayeredMapping}
 import com.typesafe.sbt.packager.linux.Mapper.packageTemplateMapping
 
@@ -72,11 +71,8 @@ object SbtDASPlugin extends AutoPlugin {
     publish / skip := false,
     publishMavenStyle := true,
     publishTo := {
-      // We use the same "maven.pkg.github.com/orgUsername/repo" as the original
       val repoName = repoNameSetting.value
-      Some(
-        s"GitHub $orgUsername Apache Maven Packages" at
-          s"https://maven.pkg.github.com/$orgUsername/$repoName")
+      Some(s"GitHub $orgUsername Apache Maven Packages" at s"https://maven.pkg.github.com/$orgUsername/$repoName")
     },
     // Overwrite artifacts in CI
     publishConfiguration := {
@@ -94,8 +90,7 @@ object SbtDASPlugin extends AutoPlugin {
       "vendor" -> "RAW Labs SA",
       "product" -> s"${repoNameSetting.value}-server",
       "image-type" -> "final",
-      "org.opencontainers.image.source" ->
-        s"https://github.com/$orgUsername/${repoNameSetting.value}"),
+      "org.opencontainers.image.source" -> s"https://github.com/$orgUsername/${repoNameSetting.value}"),
     Docker / daemonUser := "raw",
     Docker / daemonUserUid := Some("1001"),
     Docker / daemonGroup := "raw",
