@@ -14,7 +14,7 @@ lazy val root = (project in file("."))
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.18.2",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2")),
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"),
     dependencyOverrides ++= Seq(
       "io.netty" % "netty-handler" % "4.1.118.Final"
-    )
+    ))
