@@ -146,21 +146,9 @@ object SbtDASPlugin extends AutoPlugin {
       dockerAlias.value.withRegistryHost(Some(devRegistry))
     },
 
-    // Optionally push to multiple registries if RELEASE_DOCKER_REGISTRY is set
-    dockerAliases := {
-      val devRegistry = sys.env.getOrElse("DEV_REGISTRY", s"ghcr.io/$orgUsername/${repoNameSetting.value}")
-      val releaseRegistry = sys.env.get("RELEASE_DOCKER_REGISTRY")
-
-      val baseAlias = dockerAlias.value.withRegistryHost(Some(devRegistry))
-      releaseRegistry match {
-        case Some(rr) => Seq(baseAlias, dockerAlias.value.withRegistryHost(Some(rr)))
-        case None     => Seq(baseAlias)
-      }
-    },
-
     // Define the printDockerImageName task
     printDockerImageName := {
-      val alias = (Docker / dockerAliases).value.head
+      val alias = (Docker / dockerAlias).value.head
       println(s"DOCKER_IMAGE=$alias")
     })
 
