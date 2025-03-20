@@ -140,9 +140,9 @@ object SbtDASPlugin extends AutoPlugin {
       ver.replaceAll("[+]", "-").replaceAll("[^\\w.-]", "-")
     },
 
-    // Let Docker push to GHCR by default, or dev override with DEV_REGISTRY
+    // Let Docker push to GHCR by default
     dockerAlias := {
-      val devRegistry = sys.env.getOrElse("DEV_REGISTRY", s"ghcr.io/$orgUsername/${repoNameSetting.value}")
+      val devRegistry = s"ghcr.io/$orgUsername/${repoNameSetting.value}"
       dockerAlias.value.withRegistryHost(Some(devRegistry))
     },
 
