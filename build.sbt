@@ -1,15 +1,21 @@
-import java.nio.file.Paths
-
 import sbt.Keys._
 import sbt._
 
-import com.typesafe.sbt.packager.docker.{Cmd, LayeredMapping}
+import com.typesafe.sbt.packager.docker.LayeredMapping
 
 ThisBuild / credentials += Credentials(
   "GitHub Package Registry",
   "maven.pkg.github.com",
   "raw-labs",
   sys.env.getOrElse("GITHUB_TOKEN", ""))
+
+// Extract organization username for GitHub
+lazy val orgUsername = "raw-labs"
+lazy val repoName = "das-salesforce"
+lazy val gitHubRepo = s"$orgUsername/$repoName"
+lazy val gitHubUrl = s"https://github.com/$gitHubRepo"
+lazy val ghcrRegistry = s"ghcr.io/$gitHubRepo"
+lazy val mavenRegistry = s"https://maven.pkg.github.com/$orgUsername/$repoName"
 
 lazy val commonSettings = Seq(
   homepage := Some(url("https://www.raw-labs.com/")),
@@ -19,21 +25,12 @@ lazy val commonSettings = Seq(
   // Use cached resolution of dependencies
   // http://www.scala-sbt.org/0.13/docs/Cached-Resolution.html
   updateOptions := updateOptions.in(Global).value.withCachedResolution(true),
+  // Add local Maven repository to resolvers
   resolvers ++= Seq(Resolver.mavenLocal),
+  // Add RAW Labs Package Registry to resolvers
   resolvers += "RAW Labs GitHub Packages" at "https://maven.pkg.github.com/raw-labs/_")
 
-lazy val buildSettings = Seq(
-  scalaVersion := "2.13.15",
-  javacOptions ++= Seq("-source", "21", "-target", "21"),
-  scalacOptions ++= Seq(
-    "-feature",
-    "-unchecked",
-    "-deprecation",
-    "-Xlint:-stars-align,_",
-    "-Ywarn-dead-code",
-    "-Ywarn-macros:after", // Fix for false warning of unused implicit arguments in traits/interfaces.
-    "-Ypatmat-exhaust-depth",
-    "160"))
+lazy val buildSettings = Seq(scalaVersion := "2.13.15")
 
 lazy val compileSettings = Seq(
   Compile / doc / sources := Seq.empty,
@@ -44,29 +41,14 @@ lazy val compileSettings = Seq(
     "Automatic-Module-Name" -> name.value.replace('-', '.')),
   // Ensure Java annotations get compiled first, so that they are accessible from Scala.
   compileOrder := CompileOrder.JavaThenScala,
-  Compile / mainClass := Some("com.rawlabs.das.server.DASServer")
-  )
+  // Ensure we fork new JVM for run, so we can set JVM flags.
+  Compile / run / fork := true,
+  Compile / mainClass := Some("com.rawlabs.das.server.DASServer"))
 
 lazy val testSettings = Seq(
   // Ensuring tests are run in a forked JVM for isolation.
   Test / fork := true,
-  // Disabling parallel execution of tests.
-  // Test / parallelExecution := false,
-  // Pass system properties starting with "raw." to the forked JVMs.
-  Test / javaOptions ++= {
-    import scala.collection.JavaConverters._
-    val props = System.getProperties
-    props
-      .stringPropertyNames()
-      .asScala
-      .filter(_.startsWith("raw."))
-      .map(key => s"-D$key=${props.getProperty(key)}")
-      .toSeq
-  },
-  // Set up heap dump options for out-of-memory errors.
-  Test / javaOptions ++= Seq(
-    "-XX:+HeapDumpOnOutOfMemoryError",
-    s"-XX:HeapDumpPath=${Paths.get(sys.env.getOrElse("SBT_FORK_OUTPUT_DIR", "target/test-results")).resolve("heap-dumps")}"),
+  // Required for publishing test artifacts.
   Test / publishArtifact := true)
 
 val isCI = sys.env.getOrElse("CI", "false").toBoolean
@@ -75,7 +57,7 @@ lazy val publishSettings = Seq(
   versionScheme := Some("early-semver"),
   publish / skip := false,
   publishMavenStyle := true,
-  publishTo := Some("GitHub raw-labs Apache Maven Packages" at "https://maven.pkg.github.com/raw-labs/das-salesforce"),
+  publishTo := Some("GitHub raw-labs Apache Maven Packages" at mavenRegistry),
   publishConfiguration := publishConfiguration.value.withOverwrite(isCI))
 
 lazy val strictBuildSettings =
@@ -84,7 +66,7 @@ lazy val strictBuildSettings =
 lazy val root = (project in file("."))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(
-    name := "das-salesforce",
+    name := repoName,
     strictBuildSettings,
     publishSettings,
     libraryDependencies ++= Seq(
@@ -98,24 +80,17 @@ lazy val root = (project in file("."))
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.18.2",
       "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.18.2",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"
-      )
-      ,
-      dependencyOverrides ++= Seq(
-        "io.netty" % "netty-handler" % "4.1.118.Final",
-        "com.google.protobuf" % "protobuf-java" % "3.25.5"
-      ),
-      dockerSettings
-  )
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.18.2"),
+    dockerSettings)
 
 lazy val dockerSettings = Seq(
-  Docker/ packageName := "das-salesforce-server",
+  Docker / packageName := s"$repoName-server",
   dockerBaseImage := "eclipse-temurin:21-jre",
   dockerLabels ++= Map(
     "vendor" -> "RAW Labs SA",
-    "product" -> "das-salesforce-server",
+    "product" -> s"$repoName-server",
     "image-type" -> "final",
-    "org.opencontainers.image.source" -> "https://github.com/raw-labs/das-salesforce"),
+    "org.opencontainers.image.source" -> s"https://github.com/raw-labs/$repoName"),
   Docker / daemonUser := "raw",
   Docker / daemonUserUid := Some("1001"),
   Docker / daemonGroup := "raw",
@@ -151,9 +126,18 @@ lazy val dockerSettings = Seq(
     }
     case lm @ _ => lm
   },
-  dockerAlias := dockerAlias.value.withTag(Option(version.value.replace("+", "-"))),
+  Docker / version := {
+    val ver = version.value
+    // Docker tags have their own restrictions - only allow [a-zA-Z0-9_.-]
+    // Replace + with - and ensure no invalid characters
+    ver.replaceAll("[+]", "-").replaceAll("[^\\w.-]", "-")
+  },
+  dockerAlias := {
+    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", ghcrRegistry)
+    dockerAlias.value.withRegistryHost(Some(devRegistry))
+  },
   dockerAliases := {
-    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", "ghcr.io/raw-labs/das-salesforce")
+    val devRegistry = sys.env.getOrElse("DEV_REGISTRY", ghcrRegistry)
     val releaseRegistry = sys.env.get("RELEASE_DOCKER_REGISTRY")
     val baseAlias = dockerAlias.value.withRegistryHost(Some(devRegistry))
 
