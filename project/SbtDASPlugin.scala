@@ -148,7 +148,7 @@ object SbtDASPlugin extends AutoPlugin {
 
     // Define the printDockerImageName task
     printDockerImageName := {
-      val alias = (Docker / dockerAlias).value.head
+      val alias = (Docker / dockerAlias).value
       println(s"DOCKER_IMAGE=$alias")
     })
 
