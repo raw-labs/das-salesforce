@@ -62,7 +62,6 @@ class DASSalesforceSOQLFunction(executeSOQL: String => Iterable[Map[_, _]])
   }
 
   private def anyToValue(value: Any): Value = {
-    logger.info(s"Converting value: $value")
     value match {
       case null       => Value.newBuilder().setNull(ValueNull.newBuilder()).build()
       case v: String  => Value.newBuilder().setString(ValueString.newBuilder().setV(v)).build()
