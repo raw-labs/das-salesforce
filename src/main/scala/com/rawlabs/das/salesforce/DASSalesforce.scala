@@ -70,21 +70,6 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
     contentDocumentLinkTable,
     contentVersionTable)
 
-  private val dynamicTableNames = {
-    options.get("dynamic_objects") match {
-      case Some(objectNames) =>
-        val objs = objectNames.strip()
-        if (objs.isEmpty) {
-          Seq.empty
-        } else {
-          objs.split(",").map(_.strip).filter(_.nonEmpty).toSeq
-        }
-      case None => Seq.empty
-    }
-  }
-
-  logger.debug(s"Dynamic tables: $dynamicTableNames")
-
   private val maybeDatedConversionRateTable: Option[DASSalesforceDatedConversionRateTable] = {
     try {
       val description = connector.describeSObject("DatedConversionRate")
@@ -96,6 +81,31 @@ class DASSalesforce(options: Map[String, String]) extends DASSdk with StrictLogg
         None
     }
   }
+
+  private val dynamicTableNames = {
+    options.get("dynamic_objects") match {
+      case Some(objectNames) =>
+        val objs = objectNames.strip()
+        if (objs.isEmpty) {
+          Seq.empty
+        } else {
+          // Get the names of the static tables to avoid duplicates
+          val staticNames = staticTables.map(_.salesforceObjectName).toSet ++ maybeDatedConversionRateTable
+            .map(_.salesforceObjectName)
+            .toSet
+          objs
+            .split(",")
+            .map(_.strip)
+            .filter(_.nonEmpty)
+            .distinct // Remove duplicates
+            .filterNot(staticNames.contains) // Ignore duplicates of static tables
+            .toSeq
+        }
+      case None => Seq.empty
+    }
+  }
+
+  logger.debug(s"Dynamic tables: $dynamicTableNames")
 
   private val dynamicTables = dynamicTableNames.map(name => new DASSalesforceDynamicTable(connector, name))
 
